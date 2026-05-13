@@ -8,55 +8,92 @@ import { CommonModule } from '@angular/common';
   template: `
     <footer class="footer">
       <div class="footer-content">
-        <div class="footer-brand">
-          <span class="logo">🐾</span>
-          <span class="title">Sanos y Salvos</span>
+        <div class="social-links">
+          <a href="https://www.tiktok.com" target="_blank" class="social-icon" title="TikTok">
+            <i class="fab fa-tiktok"></i>
+          </a>
+          <a href="https://www.instagram.com" target="_blank" class="social-icon" title="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="https://wa.me/56912345678" target="_blank" class="social-icon" title="WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://www.facebook.com" target="_blank" class="social-icon" title="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
         </div>
-        <p class="tagline">Ayudando a que cada mascota encuentre el camino a casa.</p>
+
+        <div class="contact-email">
+          <a href="mailto:contacto@sanosysalvo.cl">contacto&#64;sanosysalvo.cl</a>
+        </div>
+
         <div class="footer-bottom">
-          <p>&copy; {{ currentYear }} Todos los derechos reservados</p>
+          <p><span class="brand">🐾 Sanos y Salvos</span> &copy; {{ currentYear }}</p>
         </div>
       </div>
     </footer>`,
   styles: [`
     .footer {
-      background: #1a237e; /* El mismo azul de tu Navbar */
-      color: white;        /* Cambiamos el texto a blanco para que se lea bien */
-      padding: 2rem 0 1rem 0;
+      background: #1a237e;
+      color: white;
+      padding: 2.5rem 0 1.5rem 0;
       margin-top: 4rem;
       width: 100%;
-      box-shadow: 0 -2px 8px rgba(0,0,0,.2); /* Sombra invertida hacia arriba */
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
     .footer-content {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
+      gap: 1.2rem;
       max-width: 1200px;
       margin: 0 auto;
     }
-    .footer-brand {
+    .social-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .social-icon {
+      width: 45px;
+      height: 45px;
+      background: white;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s ease;
     }
-    .footer-brand .title {
-      font-weight: 700;
-      color: white; /* Título en blanco */
+    /* Forzamos el color del icono para que siempre sea el azul del nav */
+    .social-icon i {
+      color: #1a237e !important; 
+      font-size: 1.3rem;
+      display: block;
     }
-    .tagline {
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.8); /* Blanco con un poco de transparencia */
-      margin-bottom: 1rem;
+    .social-icon:hover {
+      transform: translateY(-5px);
+      background: #ffca28;
+    }
+    .contact-email a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+    .contact-email a:hover {
+      color: #ffca28;
+      text-decoration: underline;
     }
     .footer-bottom {
-      width: 80%;
-      border-top: 1px solid rgba(255, 255, 255, 0.1); /* Línea divisoria sutil */
+      width: 90%;
+      max-width: 600px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       padding-top: 1rem;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: rgba(255, 255, 255, 0.6);
       text-align: center;
     }
+    .brand { font-weight: 700; color: white; margin-right: 5px; }
   `]
 })
 export class FooterComponent {
