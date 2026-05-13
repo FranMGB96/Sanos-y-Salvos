@@ -11,5 +11,6 @@ export const routes: Routes = [
   { path: 'pets/edit/:id', canActivate: [authGuard], loadComponent: () => import('./features/pets/pet-form/pet-form.component').then(m => m.PetFormComponent) },
   { path: 'reports',   canActivate: [authGuard], loadComponent: () => import('./features/reports/report-list/report-list.component').then(m => m.ReportListComponent) },
   { path: 'reports/new', canActivate: [authGuard], loadComponent: () => import('./features/reports/report-form/report-form.component').then(m => m.ReportFormComponent) },
-  { path: '**', redirectTo: 'dashboard' }
+  { path: 'nosotros',   loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent) },
+  { path: '**', redirectTo: 'dashboard' },
 ];

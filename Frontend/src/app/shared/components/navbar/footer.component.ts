@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router'; // Importante para la navegación
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink], // Añadido RouterLink aquí
   template: `
     <footer class="footer">
       <div class="footer-content">
@@ -21,6 +22,10 @@ import { CommonModule } from '@angular/common';
           <a href="https://www.facebook.com" target="_blank" class="social-icon" title="Facebook">
             <i class="fab fa-facebook-f"></i>
           </a>
+        </div>
+
+        <div class="footer-nav">
+          <a routerLink="/nosotros" class="nav-link">Nosotros</a>
         </div>
 
         <div class="contact-email">
@@ -64,7 +69,6 @@ import { CommonModule } from '@angular/common';
       text-decoration: none;
       transition: all 0.3s ease;
     }
-    /* Forzamos el color del icono para que siempre sea el azul del nav */
     .social-icon i {
       color: #1a237e !important; 
       font-size: 1.3rem;
@@ -73,6 +77,19 @@ import { CommonModule } from '@angular/common';
     .social-icon:hover {
       transform: translateY(-5px);
       background: #ffca28;
+    }
+    .footer-nav {
+      margin: 0.5rem 0;
+    }
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover {
+      color: #ffca28;
     }
     .contact-email a {
       color: white;
