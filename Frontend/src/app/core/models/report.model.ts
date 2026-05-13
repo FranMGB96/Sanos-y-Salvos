@@ -1,0 +1,3 @@
+export interface Report { id?: number; tipo: 'PERDIDO'|'ENCONTRADO'; descripcion: string; latitud?: number; longitud?: number; ubicacionDescripcion?: string; petId?: number; reporterUserId: number; estado?: 'ACTIVO'|'RESUELTO'|'CERRADO'; createdAt?: string; updatedAt?: string; }
+export interface ReporteConDetalle extends Report { mascota?: { id: number; nombre: string; especie: string; raza?: string; color?: string; fotoUrl?: string; }; }
+export interface Dashboard { totalUsuarios: number; totalMascotas: number; totalReportes: number; reportesActivos: number; reportesPerdidos: number; reportesEncontrados: number; ultimosReportes: ReporteConDetalle[]; }
