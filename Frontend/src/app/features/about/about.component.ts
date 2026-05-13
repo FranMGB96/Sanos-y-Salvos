@@ -10,6 +10,10 @@ import { CommonModule } from '@angular/common';
       <section class="hero-section">
         <h1>Sobre Nosotros</h1>
         <p>En <strong>Sanos y Salvos</strong>, creemos que cada mascota merece estar en casa.</p>
+        
+        <div class="image-wrapper animate-up">
+          <img src="assets/SanosySalvos.png" alt="Sanos y Salvos Mascotas" class="mid-image">
+        </div>
       </section>
 
       <div class="content-grid">
@@ -41,7 +45,9 @@ import { CommonModule } from '@angular/common';
     }
     .hero-section {
       text-align: center;
-      margin-bottom: 4rem;
+      margin-bottom: 0; 
+      position: relative;
+      z-index: 10;
     }
     .hero-section h1 {
       color: #1a237e;
@@ -52,10 +58,31 @@ import { CommonModule } from '@angular/common';
       font-size: 1.2rem;
       color: #555;
     }
+
+    /* Ajustes de la imagen */
+    .image-wrapper {
+      margin-top: 2.5rem;
+      /* Margen negativo para que la imagen se meta entre las tarjetas */
+      margin-bottom: -120px; /* Aumentado ligeramente para acomodar la nueva altura */
+      display: flex;
+      justify-content: center;
+    }
+    .mid-image {
+      width: 100%;
+      max-width: 700px; /* Agrandado un poco para dar más aire */
+      height: auto; /* Permite que la altura se ajuste proporcionalmente */
+      /* ELIMINADO: object-fit: cover; - Esto causaba el recorte */
+      /* ELIMINADO: aspect-ratio: 16 / 7; - Forzaba una proporción incorrecta */
+      border-radius: 20px;
+      border: 8px solid white; /* Borde un poco más grueso para más aire */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
     .content-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 2rem;
+      padding-top: 8rem; /* Espacio para que la imagen no tape el texto de las tarjetas */
     }
     .card {
       background: white;
@@ -80,6 +107,7 @@ import { CommonModule } from '@angular/common';
       grid-column: span 2;
       border-top: 5px solid #ffca28;
     }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -87,10 +115,17 @@ import { CommonModule } from '@angular/common';
     .animate-up {
       animation: fadeInUp 0.6s ease forwards;
     }
+
     @media (max-width: 768px) {
-      .content-grid { grid-template-columns: 1fr; }
+      .content-grid { 
+        grid-template-columns: 1fr; 
+        padding-top: 10rem; /* Aumentado para móvil */
+      }
       .full-width { grid-column: span 1; }
-      .hero-section h1 { font-size: 2.2rem; }
+      .mid-image { 
+        max-width: 95%; 
+        margin-bottom: -60px; /* Ajustado para móvil */
+      }
     }
   `]
 })
