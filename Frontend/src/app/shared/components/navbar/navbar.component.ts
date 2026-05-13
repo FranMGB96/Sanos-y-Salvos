@@ -10,13 +10,12 @@ import { CommonModule } from '@angular/common';
     <nav class="navbar">
       <div class="brand"><span class="logo">🐾</span><span class="title">Sanos y Salvos</span></div>
       <div class="links">
-        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/dashboard" routerLinkActive="active">Inicio</a>
         <a routerLink="/pets"      routerLinkActive="active">Mascotas</a>
         <a routerLink="/reports"   routerLinkActive="active">Reportes</a>
       </div>
       <div class="user-info">
         <span class="user-name">{{ user?.nombre }}</span>
-        <span class="user-role">{{ user?.rol }}</span>
         <button class="btn-logout" (click)="logout()">Salir</button>
       </div>
     </nav>`,
