@@ -36,8 +36,7 @@ class ReportServiceTest {
         Report r = Report.builder().id(1L).tipo(Report.TipoReporte.PERDIDO).descripcion("test").reporterUserId(1L).estado(Report.EstadoReporte.ACTIVO).build();
         when(reportRepository.findById(1L)).thenReturn(Optional.of(r));
         when(reportRepository.save(any())).thenReturn(r);
-        reportService.updateEstado(1L, "RESUELTO", 1L);
-        ReportDto result = reportService.updateEstado(1L, "RESUELTO", 1L);
+        ReportDto result = reportService.updateEstado(1L, "RESUELTO", 1L, "OWNER");
     }
 
     @Test void getByTipo_retornaFiltrados() {

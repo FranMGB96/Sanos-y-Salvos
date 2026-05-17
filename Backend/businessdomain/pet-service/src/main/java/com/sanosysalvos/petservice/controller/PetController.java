@@ -82,7 +82,8 @@ public class PetController {
             @RequestParam(value = "tamanio", required = false) String tamanio,
             @RequestParam(value = "descripcion", required = false) String descripcion,
             @RequestParam(value = "foto", required = false) MultipartFile foto,
-            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
+            @RequestHeader("X-User-Id") String requestingUserId,
+            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
     ) throws IOException {
 
         String fotoUrl = procesarFoto(foto);
@@ -95,19 +96,19 @@ public class PetController {
         dto.setTamanio(tamanio);
         dto.setDescripcion(descripcion);
         dto.setFotoUrl(fotoUrl);
-        // ✅ ownerId ya NO viene del frontend
 
         return ResponseEntity.ok(
-                petService.updatePet(id, dto, Long.parseLong(requestingUserId))
+                petService.updatePet(id, dto, Long.parseLong(requestingUserId), requestingUserRole)
         );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
+            @RequestHeader("X-User-Id") String requestingUserId,
+            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
     ) {
-        petService.deletePet(id, Long.parseLong(requestingUserId));
+        petService.deletePet(id, Long.parseLong(requestingUserId), requestingUserRole);
         return ResponseEntity.noContent().build();
     }
 

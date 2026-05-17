@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.sanosysalvos.petservice.exception.UnauthorizedException;
 
 @Service
 public class PetService {
@@ -46,10 +47,13 @@ public class PetService {
         return toDto(petRepository.save(pet));
     }
 
-    public PetDto updatePet(Long id, PetDto dto, Long requestingUserId) {
+    public PetDto updatePet(Long id, PetDto dto, Long requestingUserId, String requestingUserRole) {
         Pet pet = findOrThrow(id);
 
-        if (!pet.getOwnerId().equals(requestingUserId)) {
+        boolean esAdmin = "ADMIN".equals(requestingUserRole);
+        boolean esDuenio = pet.getOwnerId().equals(requestingUserId);
+
+        if (!esAdmin && !esDuenio) {
             throw new UnauthorizedException("No tienes permiso para modificar esta mascota");
         }
 
@@ -64,10 +68,14 @@ public class PetService {
         return toDto(petRepository.save(pet));
     }
 
-    public void deletePet(Long id, Long requestingUserId) {
+    // deletePet — cambia la firma y la validación
+    public void deletePet(Long id, Long requestingUserId, String requestingUserRole) {
         Pet p = findOrThrow(id);
 
-        if (!p.getOwnerId().equals(requestingUserId)) {
+        boolean esAdmin = "ADMIN".equals(requestingUserRole);
+        boolean esDuenio = p.getOwnerId().equals(requestingUserId);
+
+        if (!esAdmin && !esDuenio) {
             throw new UnauthorizedException("No tienes permiso para eliminar esta mascota");
         }
 

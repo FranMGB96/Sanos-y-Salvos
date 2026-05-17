@@ -55,11 +55,13 @@ public class ReportService {
         return toDto(reportRepository.save(r));
     }
 
-    public ReportDto updateReport(Long id, ReportDto dto, Long requestingUserId) {
+    public ReportDto updateReport(Long id, ReportDto dto, Long requestingUserId, String requestingUserRole) {
         Report r = findOrThrow(id);
 
-        // ✅ Solo el dueño del reporte puede editarlo
-        if (!r.getReporterUserId().equals(requestingUserId)) {
+        boolean esAdmin = "ADMIN".equals(requestingUserRole);
+        boolean esDuenio = r.getReporterUserId().equals(requestingUserId);
+
+        if (!esAdmin && !esDuenio) {
             throw new UnauthorizedException("No tienes permiso para modificar este reporte");
         }
 
@@ -73,11 +75,13 @@ public class ReportService {
         return toDto(reportRepository.save(r));
     }
 
-    public ReportDto updateEstado(Long id, String nuevoEstado, Long requestingUserId) {
+    public ReportDto updateEstado(Long id, String nuevoEstado, Long requestingUserId, String requestingUserRole) {
         Report r = findOrThrow(id);
 
-        // ✅ Solo el dueño puede cambiar el estado
-        if (!r.getReporterUserId().equals(requestingUserId)) {
+        boolean esAdmin = "ADMIN".equals(requestingUserRole);
+        boolean esDuenio = r.getReporterUserId().equals(requestingUserId);
+
+        if (!esAdmin && !esDuenio) {
             throw new UnauthorizedException("No tienes permiso para modificar este reporte");
         }
 
@@ -86,11 +90,13 @@ public class ReportService {
         return toDto(reportRepository.save(r));
     }
 
-    public void deleteReport(Long id, Long requestingUserId) {
+    public void deleteReport(Long id, Long requestingUserId, String requestingUserRole) {
         Report r = findOrThrow(id);
 
-        // ✅ Solo el dueño puede eliminar
-        if (!r.getReporterUserId().equals(requestingUserId)) {
+        boolean esAdmin = "ADMIN".equals(requestingUserRole);
+        boolean esDuenio = r.getReporterUserId().equals(requestingUserId);
+
+        if (!esAdmin && !esDuenio) {
             throw new UnauthorizedException("No tienes permiso para eliminar este reporte");
         }
 
@@ -98,7 +104,6 @@ public class ReportService {
         r.setUpdatedAt(LocalDateTime.now());
         reportRepository.save(r);
     }
-
     private Report findOrThrow(Long id) {
         return reportRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reporte no encontrado: " + id));

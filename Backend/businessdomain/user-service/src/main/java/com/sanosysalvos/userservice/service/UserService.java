@@ -24,10 +24,14 @@ public class UserService {
     public AuthDto.AuthResponse register(AuthDto.RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail()))
             throw new BadRequestException("Ya existe un usuario con ese email");
-        User.Role role = User.Role.OWNER;
-        if (request.getRol() != null) { try { role = User.Role.valueOf(request.getRol().toUpperCase()); } catch (IllegalArgumentException ignored) {} }
-        User user = User.builder().nombre(request.getNombre()).email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword())).rol(role).build();
+
+        User user = User.builder()
+                .nombre(request.getNombre())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .rol(User.Role.OWNER)
+                .build();
+
         user = userRepository.save(user);
         var details = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtUtil.generateToken(details, user.getId(), user.getRol().name());
