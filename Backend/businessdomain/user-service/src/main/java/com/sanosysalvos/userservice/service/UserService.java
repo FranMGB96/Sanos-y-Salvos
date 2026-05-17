@@ -46,21 +46,63 @@ public class UserService {
         return new AuthDto.AuthResponse(token, user.getId(), user.getNombre(), user.getEmail(), user.getRol().name());
     }
 
-    public List<UserDto> getAllUsers() { return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList()); }
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+    }
 
-    public UserDto getUserById(Long id) { return toDto(userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id))); }
+    public UserDto getUserById(Long id) {
+        return toDto(userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id)));
+    }
 
     public UserDto updateUser(Long id, UserDto dto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
-        if (dto.getNombre() != null) user.setNombre(dto.getNombre());
-        if (dto.getEmail() != null) { if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) throw new BadRequestException("Email ya en uso"); user.setEmail(dto.getEmail()); }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
+
+        // Actualizar nombre
+        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
+            user.setNombre(dto.getNombre());
+        }
+
+        // Actualizar email (verificando que no esté en uso por otro usuario)
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+                throw new BadRequestException("Email ya en uso");
+            }
+            user.setEmail(dto.getEmail());
+        }
+
+        // ✅ Actualizar rol (solo si viene un valor válido)
+        if (dto.getRol() != null && !dto.getRol().isBlank()) {
+            try {
+                user.setRol(User.Role.valueOf(dto.getRol().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Rol inválido: " + dto.getRol() + ". Valores válidos: OWNER, CITIZEN, ORG, ADMIN");
+            }
+        }
+
+        // ✅ Actualizar estado activo/inactivo
+        if (dto.getActive() != null) {
+            user.setActive(dto.getActive());
+        }
+
         return toDto(userRepository.save(user));
     }
 
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
-        user.setActive(false); userRepository.save(user);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
+        user.setActive(false);
+        userRepository.save(user);
     }
 
-    private UserDto toDto(User u) { return UserDto.builder().id(u.getId()).nombre(u.getNombre()).email(u.getEmail()).rol(u.getRol().name()).active(u.getActive()).createdAt(u.getCreatedAt()).build(); }
+    private UserDto toDto(User u) {
+        return UserDto.builder()
+                .id(u.getId())
+                .nombre(u.getNombre())
+                .email(u.getEmail())
+                .rol(u.getRol().name())
+                .active(u.getActive())
+                .createdAt(u.getCreatedAt())
+                .build();
+    }
 }

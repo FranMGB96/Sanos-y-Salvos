@@ -20,10 +20,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(c -> c.disable())
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(a -> a
-                .requestMatchers("/auth/**", "/actuator/**", "/swagger-ui/**", "/api-docs/**").permitAll()
-                .anyRequest().authenticated());
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(a -> a
+                        // El gateway ya validó el JWT — este servicio confía en él
+                        .anyRequest().permitAll()
+                );
         return http.build();
     }
 
@@ -32,7 +33,9 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         var p = new DaoAuthenticationProvider();
-        p.setUserDetailsService(userDetailsService); p.setPasswordEncoder(passwordEncoder()); return p;
+        p.setUserDetailsService(userDetailsService);
+        p.setPasswordEncoder(passwordEncoder());
+        return p;
     }
 
     @Bean
