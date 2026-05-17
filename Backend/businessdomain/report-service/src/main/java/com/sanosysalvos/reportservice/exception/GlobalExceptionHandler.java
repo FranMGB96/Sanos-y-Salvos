@@ -22,4 +22,8 @@ public class GlobalExceptionHandler {
         b.put("timestamp", LocalDateTime.now().toString()); b.put("status", s.value()); b.put("error", s.getReasonPhrase()); b.put("message", msg);
         return ResponseEntity.status(s).body(b);
     }
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<String> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
 }

@@ -2,16 +2,12 @@ package com.sanosysalvos.reportservice.controller;
 
 import com.sanosysalvos.reportservice.dto.ReportDto;
 import com.sanosysalvos.reportservice.service.ReportService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -54,30 +50,37 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<ReportDto> create(@Valid @RequestBody ReportDto dto) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(reportService.createReport(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(reportService.createReport(dto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ReportDto> update(
             @PathVariable Long id,
-            @RequestBody ReportDto dto
+            @RequestBody ReportDto dto,
+            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
     ) {
-        return ResponseEntity.ok(reportService.updateReport(id, dto));
+        return ResponseEntity.ok(
+                reportService.updateReport(id, dto, Long.parseLong(requestingUserId))
+        );
     }
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<ReportDto> updateEstado(
             @PathVariable Long id,
-            @RequestParam String estado
+            @RequestParam String estado,
+            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
     ) {
-        return ResponseEntity.ok(reportService.updateEstado(id, estado));
+        return ResponseEntity.ok(
+                reportService.updateEstado(id, estado, Long.parseLong(requestingUserId))
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        reportService.deleteReport(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
+    ) {
+        reportService.deleteReport(id, Long.parseLong(requestingUserId));
         return ResponseEntity.noContent().build();
     }
 }
