@@ -43,7 +43,7 @@ class PetServiceTest {
         Pet pet = Pet.builder().id(1L).nombre("Rex").especie("perro").ownerId(1L).active(true).build();
         when(petRepository.findById(1L)).thenReturn(Optional.of(pet));
         when(petRepository.save(any())).thenReturn(pet);
-        petService.deletePet(1L);
+        petService.deletePet(1L, 1L);
         assertFalse(pet.getActive());
     }
 }

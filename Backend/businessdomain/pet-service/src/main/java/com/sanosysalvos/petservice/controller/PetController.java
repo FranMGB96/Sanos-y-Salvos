@@ -2,32 +2,24 @@ package com.sanosysalvos.petservice.controller;
 
 import com.sanosysalvos.petservice.dto.PetDto;
 import com.sanosysalvos.petservice.service.PetService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/pets")
 @Tag(name = "Mascotas")
-
 public class PetController {
 
     @Autowired
@@ -35,99 +27,39 @@ public class PetController {
 
     @GetMapping
     public ResponseEntity<List<PetDto>> getAll() {
-
-        return ResponseEntity.ok(
-                petService.getAllPets()
-        );
+        return ResponseEntity.ok(petService.getAllPets());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PetDto> getById(@PathVariable Long id) {
-
-        return ResponseEntity.ok(
-                petService.getPetById(id)
-        );
+        return ResponseEntity.ok(petService.getPetById(id));
     }
 
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<PetDto>> getByOwner(
-            @PathVariable Long ownerId
-    ) {
-
-        return ResponseEntity.ok(
-                petService.getPetsByOwner(ownerId)
-        );
+    public ResponseEntity<List<PetDto>> getByOwner(@PathVariable Long ownerId) {
+        return ResponseEntity.ok(petService.getPetsByOwner(ownerId));
     }
 
     @GetMapping("/especie/{especie}")
-    public ResponseEntity<List<PetDto>> getByEspecie(
-            @PathVariable String especie
-    ) {
-
-        return ResponseEntity.ok(
-                petService.getPetsByEspecie(especie)
-        );
+    public ResponseEntity<List<PetDto>> getByEspecie(@PathVariable String especie) {
+        return ResponseEntity.ok(petService.getPetsByEspecie(especie));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PetDto> create(
-
             @RequestParam("nombre") String nombre,
-
             @RequestParam("especie") String especie,
-
-            @RequestParam(value = "raza", required = false)
-            String raza,
-
-            @RequestParam(value = "color", required = false)
-            String color,
-
-            @RequestParam(value = "tamanio", required = false)
-            String tamanio,
-
-            @RequestParam(value = "descripcion", required = false)
-            String descripcion,
-
-            @RequestParam("ownerId")
-            Long ownerId,
-
-            @RequestParam(value = "foto", required = false)
-            MultipartFile foto
-
+            @RequestParam(value = "raza", required = false) String raza,
+            @RequestParam(value = "color", required = false) String color,
+            @RequestParam(value = "tamanio", required = false) String tamanio,
+            @RequestParam(value = "descripcion", required = false) String descripcion,
+            @RequestParam("ownerId") Long ownerId,
+            @RequestParam(value = "foto", required = false) MultipartFile foto
     ) throws IOException {
 
-        String fotoUrl = "";
-
-        if (foto != null && !foto.isEmpty()) {
-
-            String carpetaUploads =
-                    System.getProperty("user.dir")
-                            + "/uploads/";
-
-            File carpeta = new File(carpetaUploads);
-
-            if (!carpeta.exists()) {
-
-                carpeta.mkdirs();
-            }
-
-            String nombreArchivo =
-                    System.currentTimeMillis()
-                            + "_"
-                            + foto.getOriginalFilename();
-
-            Path rutaArchivo =
-                    Paths.get(carpetaUploads + nombreArchivo);
-
-            Files.write(rutaArchivo, foto.getBytes());
-
-            fotoUrl =
-                    "http://localhost:8082/uploads/"
-                            + nombreArchivo;
-        }
+        String fotoUrl = procesarFoto(foto);
 
         PetDto dto = new PetDto();
-
         dto.setNombre(nombre);
         dto.setEspecie(especie);
         dto.setRaza(raza);
@@ -137,105 +69,61 @@ public class PetController {
         dto.setOwnerId(ownerId);
         dto.setFotoUrl(fotoUrl);
 
-        PetDto petCreada =
-                petService.createPet(dto);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(petCreada);
+        return ResponseEntity.status(HttpStatus.CREATED).body(petService.createPet(dto));
     }
 
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PetDto> update(
-
             @PathVariable Long id,
-
-            @RequestParam("nombre")
-            String nombre,
-
-            @RequestParam("especie")
-            String especie,
-
-            @RequestParam(value = "raza", required = false)
-            String raza,
-
-            @RequestParam(value = "color", required = false)
-            String color,
-
-            @RequestParam(value = "tamanio", required = false)
-            String tamanio,
-
-            @RequestParam(value = "descripcion", required = false)
-            String descripcion,
-
-            @RequestParam("ownerId")
-            Long ownerId,
-
-            @RequestParam(value = "foto", required = false)
-            MultipartFile foto
-
+            @RequestParam("nombre") String nombre,
+            @RequestParam("especie") String especie,
+            @RequestParam(value = "raza", required = false) String raza,
+            @RequestParam(value = "color", required = false) String color,
+            @RequestParam(value = "tamanio", required = false) String tamanio,
+            @RequestParam(value = "descripcion", required = false) String descripcion,
+            @RequestParam(value = "foto", required = false) MultipartFile foto,
+            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
     ) throws IOException {
 
-        String fotoUrl = "";
-
-        if (foto != null && !foto.isEmpty()) {
-
-            String carpetaUploads =
-                    System.getProperty("user.dir")
-                            + "/uploads/";
-
-            File carpeta = new File(carpetaUploads);
-
-            if (!carpeta.exists()) {
-
-                carpeta.mkdirs();
-            }
-
-            String nombreArchivo =
-                    System.currentTimeMillis()
-                            + "_"
-                            + foto.getOriginalFilename();
-
-            Path rutaArchivo =
-                    Paths.get(carpetaUploads + nombreArchivo);
-
-            Files.write(rutaArchivo, foto.getBytes());
-
-            fotoUrl =
-                    "http://localhost:8082/uploads/"
-                            + nombreArchivo;
-        }
+        String fotoUrl = procesarFoto(foto);
 
         PetDto dto = new PetDto();
-
         dto.setNombre(nombre);
         dto.setEspecie(especie);
         dto.setRaza(raza);
         dto.setColor(color);
         dto.setTamanio(tamanio);
         dto.setDescripcion(descripcion);
-        dto.setOwnerId(ownerId);
         dto.setFotoUrl(fotoUrl);
-
-        PetDto petActualizada =
-                petService.updatePet(id, dto);
+        // ✅ ownerId ya NO viene del frontend
 
         return ResponseEntity.ok(
-                petActualizada
+                petService.updatePet(id, dto, Long.parseLong(requestingUserId))
         );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") String requestingUserId  // ✅ viene del Gateway
     ) {
-
-        petService.deletePet(id);
-
+        petService.deletePet(id, Long.parseLong(requestingUserId));
         return ResponseEntity.noContent().build();
+    }
+
+    // ── Método privado para procesar foto ────────────────────────────
+
+    private String procesarFoto(MultipartFile foto) throws IOException {
+        if (foto == null || foto.isEmpty()) return "";
+
+        String carpetaUploads = System.getProperty("user.dir") + "/uploads/";
+        File carpeta = new File(carpetaUploads);
+        if (!carpeta.exists()) carpeta.mkdirs();
+
+        String nombreArchivo = System.currentTimeMillis() + "_" + foto.getOriginalFilename();
+        Path rutaArchivo = Paths.get(carpetaUploads + nombreArchivo);
+        Files.write(rutaArchivo, foto.getBytes());
+
+        return "http://localhost:8082/uploads/" + nombreArchivo;
     }
 }

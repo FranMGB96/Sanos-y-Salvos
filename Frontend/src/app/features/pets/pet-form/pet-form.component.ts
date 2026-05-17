@@ -356,70 +356,47 @@ export class PetFormComponent implements OnInit {
     }
   }
 
-  onSubmit() {
-
-    if (this.form.invalid) {
-
-      this.form.markAllAsTouched();
-
-      return;
-    }
-
-    this.loading = true;
-
-    this.errorMsg = '';
-
-    const raw = this.form.value;
-
-    const formData = new FormData();
-
-    formData.append('nombre', raw.nombre);
-
-    formData.append('especie', raw.especie);
-
-    formData.append('raza', raw.raza || '');
-
-    formData.append('color', raw.color || '');
-
-    formData.append('tamanio', raw.tamanio || '');
-
-    formData.append('descripcion', raw.descripcion || '');
-
-    formData.append(
-      'ownerId',
-      String(this.auth.getCurrentUser()?.userId || '')
-    );
-
-    if (this.selectedFile) {
-
-      formData.append('foto', this.selectedFile);
-    }
-
-    const req = this.isEdit
-      ? this.petService.update(this.petId!, formData)
-      : this.petService.create(formData);
-
-    req.subscribe({
-
-      next: () => {
-
-        this.successMsg = this.isEdit
-          ? 'Mascota actualizada'
-          : 'Mascota registrada';
-
-        setTimeout(() => {
-
-          this.router.navigate(['/pets']);
-
-        }, 1200);
-      },
-
-      error: () => {
-
-        this.errorMsg = 'Error al guardar.';
-
-        this.loading = false;
-      }
-    });
+onSubmit() {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  this.loading = true;
+  this.errorMsg = '';
+
+  const raw = this.form.value;
+  const formData = new FormData();
+
+  formData.append('nombre', raw.nombre);
+  formData.append('especie', raw.especie);
+  formData.append('raza', raw.raza || '');
+  formData.append('color', raw.color || '');
+  formData.append('tamanio', raw.tamanio || '');
+  formData.append('descripcion', raw.descripcion || '');
+
+  // ✅ ownerId solo al crear, al editar lo toma el backend del JWT
+  if (!this.isEdit) {
+    formData.append('ownerId', String(this.auth.getCurrentUser()?.userId || ''));
+  }
+
+  if (this.selectedFile) {
+    formData.append('foto', this.selectedFile);
+  }
+
+  const req = this.isEdit
+    ? this.petService.update(this.petId!, formData)
+    : this.petService.create(formData);
+
+  req.subscribe({
+    next: () => {
+      this.successMsg = this.isEdit ? 'Mascota actualizada' : 'Mascota registrada';
+      setTimeout(() => this.router.navigate(['/pets']), 1200);
+    },
+    error: () => {
+      this.errorMsg = 'Error al guardar.';
+      this.loading = false;
+    }
+  });
+}
 }

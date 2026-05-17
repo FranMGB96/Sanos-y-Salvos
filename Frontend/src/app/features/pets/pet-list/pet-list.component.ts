@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
 import { PetService } from '../../../core/services/pet.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Pet } from '../../../core/models/pet.model';
 
 @Component({
@@ -18,307 +18,169 @@ import { Pet } from '../../../core/models/pet.model';
           <h1>Mascotas</h1>
           <p>{{ pets.length }} mascota(s) registradas</p>
         </div>
-
-        <a routerLink="/pets/new" class="btn-primary">
-          + Nueva Mascota
-        </a>
+        <a routerLink="/pets/new" class="btn-primary">+ Nueva Mascota</a>
       </div>
 
-      <div *ngIf="loading" class="loading">
-        Cargando mascotas...
-      </div>
+      <div *ngIf="loading" class="loading">Cargando mascotas...</div>
 
       <div class="pets-grid" *ngIf="!loading">
 
         <div class="pet-card" *ngFor="let pet of pets">
 
           <div class="pet-avatar">
-
             <img
               *ngIf="pet.fotoUrl"
               [src]="pet.fotoUrl"
               [alt]="pet.nombre"
               (error)="pet.fotoUrl='https://placehold.co/400x300?text=Mascota'"
             >
-
-            <span
-              *ngIf="!pet.fotoUrl"
-              class="pet-emoji"
-            >
+            <span *ngIf="!pet.fotoUrl" class="pet-emoji">
               {{ pet.especie === 'gato' ? '🐱' : '🐶' }}
             </span>
-
           </div>
 
           <div class="pet-info">
-
             <h3>{{ pet.nombre }}</h3>
-
-            <p class="pet-especie">
-              {{ pet.especie }}
-            </p>
-
+            <p class="pet-especie">{{ pet.especie }}</p>
             <div class="pet-tags">
-
-              <span class="tag" *ngIf="pet.raza">
-                {{ pet.raza }}
-              </span>
-
-              <span class="tag" *ngIf="pet.color">
-                {{ pet.color }}
-              </span>
-
-              <span class="tag" *ngIf="pet.tamanio">
-                {{ pet.tamanio }}
-              </span>
-
+              <span class="tag" *ngIf="pet.raza">{{ pet.raza }}</span>
+              <span class="tag" *ngIf="pet.color">{{ pet.color }}</span>
+              <span class="tag" *ngIf="pet.tamanio">{{ pet.tamanio }}</span>
             </div>
-
           </div>
 
-          <div class="pet-actions">
+          <!-- ✅ Botones solo visibles para el dueño -->
+          <div class="pet-actions" *ngIf="isOwner(pet)">
+            <a [routerLink]="['/pets/edit', pet.id]" class="btn-edit">Editar</a>
+            <button class="btn-delete" (click)="delete(pet)">Eliminar</button>
+          </div>
 
-            <a
-              [routerLink]="['/pets/edit', pet.id]"
-              class="btn-edit"
-            >
-              Editar
-            </a>
-
-            <button
-              class="btn-delete"
-              (click)="delete(pet)"
-            >
-              Eliminar
-            </button>
-
+          <!-- Indicador para mascotas de otros usuarios -->
+          <div class="pet-actions pet-other" *ngIf="!isOwner(pet)">
+            <span class="owner-badge">👤 Mascota de otro usuario</span>
           </div>
 
         </div>
 
-        <div
-          class="empty-state"
-          *ngIf="pets.length === 0"
-        >
-
+        <div class="empty-state" *ngIf="pets.length === 0">
           <span>🐾</span>
-
           <p>No hay mascotas registradas</p>
-
-          <a
-            routerLink="/pets/new"
-            class="btn-primary"
-          >
-            Registrar primera mascota
-          </a>
-
+          <a routerLink="/pets/new" class="btn-primary">Registrar primera mascota</a>
         </div>
 
       </div>
-
     </div>
   `,
 
-styles: [`
-  .page{
-    padding:2rem;
-    max-width:1100px;
-    margin:0 auto
-  }
+  styles: [`
+    .page{ padding:2rem; max-width:1100px; margin:0 auto }
 
-  .page-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    margin-bottom:2rem
-  }
+    .page-header{
+      display:flex; justify-content:space-between;
+      align-items:flex-start; margin-bottom:2rem
+    }
+    .page-header h1{ font-size:1.8rem; color:#1a237e; margin:0 0 .25rem }
+    .page-header p{ color:#666; margin:0; font-size:.9rem }
 
-  .page-header h1{
-    font-size:1.8rem;
-    color:#1a237e;
-    margin:0 0 .25rem
-  }
+    .btn-primary{
+      background:#1a237e; color:white; padding:.7rem 1.4rem;
+      border-radius:8px; text-decoration:none; font-weight:600; font-size:.9rem
+    }
 
-  .page-header p{
-    color:#666;
-    margin:0;
-    font-size:.9rem
-  }
+    .loading{ text-align:center; padding:3rem; color:#666 }
 
-  .btn-primary{
-    background:#1a237e;
-    color:white;
-    padding:.7rem 1.4rem;
-    border-radius:8px;
-    text-decoration:none;
-    font-weight:600;
-    font-size:.9rem
-  }
+    .pets-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:1.25rem
+    }
 
-  .loading{
-    text-align:center;
-    padding:3rem;
-    color:#666
-  }
+    .pet-card{
+      background:white; border-radius:12px; overflow:hidden;
+      box-shadow:0 2px 10px rgba(0,0,0,.08); transition:transform .2s
+    }
+    .pet-card:hover{ transform:translateY(-2px) }
 
-  .pets-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:1.25rem
-  }
+    .pet-avatar{
+      height:220px; background:#e8eaf6; display:flex;
+      align-items:center; justify-content:center; overflow:hidden
+    }
+    .pet-avatar img{ width:100%; height:100%; object-fit:contain; background:#e8eaf6 }
+    .pet-emoji{ font-size:4rem }
 
-  .pet-card{
-    background:white;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 2px 10px rgba(0,0,0,.08);
-    transition:transform .2s
-  }
+    .pet-info{ padding:1rem 1rem .5rem }
+    .pet-info h3{ margin:0 0 .2rem; font-size:1.1rem; color:#1a237e }
+    .pet-especie{ margin:0 0 .5rem; color:#666; font-size:.85rem }
 
-  .pet-card:hover{
-    transform:translateY(-2px)
-  }
+    .pet-tags{ display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.5rem }
+    .tag{
+      background:#e8eaf6; color:#3949ab;
+      padding:.15rem .5rem; border-radius:12px; font-size:.75rem
+    }
 
-  .pet-avatar{
-    height:220px;
-    background:#e8eaf6;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden
-  }
+    .pet-actions{
+      display:flex; gap:.5rem;
+      padding:.75rem 1rem; border-top:1px solid #f0f0f0
+    }
 
-  .pet-avatar img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    background:#e8eaf6;
-  }
+    .pet-other{
+      justify-content:center;
+      background:#fafafa;
+    }
 
-  .pet-emoji{
-    font-size:4rem
-  }
+    .owner-badge{
+      font-size:.78rem; color:#999; font-style:italic
+    }
 
-  .pet-info{
-    padding:1rem 1rem .5rem
-  }
+    .btn-edit{
+      flex:1; text-align:center; padding:.4rem; border-radius:6px;
+      background:#e8eaf6; color:#1a237e; text-decoration:none;
+      font-size:.85rem; font-weight:600
+    }
 
-  .pet-info h3{
-    margin:0 0 .2rem;
-    font-size:1.1rem;
-    color:#1a237e
-  }
+    .btn-delete{
+      flex:1; padding:.4rem; border-radius:6px; border:none;
+      background:#ffebee; color:#c62828; font-size:.85rem;
+      font-weight:600; cursor:pointer
+    }
 
-  .pet-especie{
-    margin:0 0 .5rem;
-    color:#666;
-    font-size:.85rem
-  }
-
-  .pet-tags{
-    display:flex;
-    flex-wrap:wrap;
-    gap:.3rem;
-    margin-bottom:.5rem
-  }
-
-  .tag{
-    background:#e8eaf6;
-    color:#3949ab;
-    padding:.15rem .5rem;
-    border-radius:12px;
-    font-size:.75rem
-  }
-
-  .pet-actions{
-    display:flex;
-    gap:.5rem;
-    padding:.75rem 1rem;
-    border-top:1px solid #f0f0f0
-  }
-
-  .btn-edit{
-    flex:1;
-    text-align:center;
-    padding:.4rem;
-    border-radius:6px;
-    background:#e8eaf6;
-    color:#1a237e;
-    text-decoration:none;
-    font-size:.85rem;
-    font-weight:600
-  }
-
-  .btn-delete{
-    flex:1;
-    padding:.4rem;
-    border-radius:6px;
-    border:none;
-    background:#ffebee;
-    color:#c62828;
-    font-size:.85rem;
-    font-weight:600;
-    cursor:pointer
-  }
-
-  .empty-state{
-    grid-column:1/-1;
-    text-align:center;
-    padding:4rem 2rem
-  }
-
-  .empty-state span{
-    font-size:4rem;
-    display:block;
-    margin-bottom:1rem
-  }
-
-  .empty-state p{
-    color:#666;
-    margin-bottom:1.5rem
-  }
-`]
+    .empty-state{ grid-column:1/-1; text-align:center; padding:4rem 2rem }
+    .empty-state span{ font-size:4rem; display:block; margin-bottom:1rem }
+    .empty-state p{ color:#666; margin-bottom:1.5rem }
+  `]
 })
 
 export class PetListComponent implements OnInit {
 
   pets: Pet[] = [];
-
   loading = true;
+  currentUserId: number | null = null;
 
   constructor(
-    private petService: PetService
+    private petService: PetService,
+    private auth: AuthService   // ✅ inyectado
   ) {}
 
   ngOnInit() {
+    // ✅ Obtener el id del usuario logueado
+    this.currentUserId = this.auth.getCurrentUser()?.userId ?? null;
 
     this.petService.getAll().subscribe({
-
-      next: (p) => {
-
-        this.pets = p;
-
-        this.loading = false;
-      },
-
-      error: () => {
-
-        this.loading = false;
-      }
+      next: (p) => { this.pets = p; this.loading = false; },
+      error: () => { this.loading = false; }
     });
   }
 
-  delete(pet: Pet) {
+  // ✅ Verifica si la mascota pertenece al usuario actual
+  isOwner(pet: Pet): boolean {
+    return pet.ownerId === this.currentUserId;
+  }
 
-    if (!confirm(`¿Eliminar a ${pet.nombre}?`)) {
-      return;
-    }
+  delete(pet: Pet) {
+    if (!confirm(`¿Eliminar a ${pet.nombre}?`)) return;
 
     this.petService.delete(pet.id!).subscribe(() => {
-
-      this.pets = this.pets.filter(
-        p => p.id !== pet.id
-      );
+      this.pets = this.pets.filter(p => p.id !== pet.id);
     });
   }
 }
