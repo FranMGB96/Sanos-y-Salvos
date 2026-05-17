@@ -37,6 +37,10 @@ import { ReporteConDetalle } from '../../../core/models/report.model';
             <span class="badge" [class]="r.tipo === 'PERDIDO' ? 'badge-red' : 'badge-green'">
               {{ r.tipo === 'PERDIDO' ? '🔍 PERDIDO' : '✅ ENCONTRADO' }}
             </span>
+            <!-- ✅ FECHA EN EL HEADER -->
+            <span class="fecha-header" *ngIf="r.createdAt">
+              🕐 {{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}
+            </span>
             <span class="estado" [class]="'estado-' + r.estado?.toLowerCase()">
               {{ r.estado }}
             </span>
@@ -54,10 +58,24 @@ import { ReporteConDetalle } from '../../../core/models/report.model';
 
             <p class="desc">{{ r.descripcion }}</p>
 
-            <div class="mascota-info" *ngIf="r.mascota">
-              <div>
+            <div class="mascota-info">
+              <div class="mascota-row" *ngIf="r.mascota">
+                <span class="mascota-icon">🐾</span>
                 <strong>{{ r.mascota.nombre }}</strong>
-                <span> · {{ r.mascota.especie }}</span>
+                <span class="sep">·</span>
+                <span>{{ r.mascota.especie }}</span>
+              </div>
+              <div class="dueno-row" *ngIf="r.nombreReporter || r.telefonoReporter">
+                <span class="mascota-icon">👤</span>
+                <span class="dueno-nombre" *ngIf="r.nombreReporter">{{ r.nombreReporter }}</span>
+                <span class="sep" *ngIf="r.nombreReporter && r.telefonoReporter">·</span>
+                <a *ngIf="r.telefonoReporter"
+                   [href]="'tel:' + r.telefonoReporter"
+                   class="dueno-tel">{{ r.telefonoReporter }}</a>
+                <a *ngIf="r.telefonoReporter"
+                   [href]="'https://wa.me/56' + r.telefonoReporter"
+                   target="_blank"
+                   class="btn-whatsapp-small">💬</a>
               </div>
             </div>
 
@@ -85,24 +103,6 @@ import { ReporteConDetalle } from '../../../core/models/report.model';
             >
               Ver ubicación completa
             </a>
-
-            <!-- ✅ CONTACTO -->
-            <div class="contacto-box" *ngIf="r.telefonoReporter">
-              <div class="contacto-label">📞 Contactar al dueño</div>
-              <div class="contacto-info">
-                <span class="contacto-nombre" *ngIf="r.nombreReporter">{{ r.nombreReporter }}</span>
-                <a [href]="'tel:' + r.telefonoReporter" class="contacto-telefono">
-                  {{ r.telefonoReporter }}
-                </a>
-                <a [href]="'https://wa.me/56' + r.telefonoReporter" target="_blank" class="btn-whatsapp">
-                  💬 WhatsApp
-                </a>
-              </div>
-            </div>
-
-            <p class="date" *ngIf="r.createdAt">
-              🕐 {{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}
-            </p>
 
           </div>
 
@@ -162,11 +162,20 @@ import { ReporteConDetalle } from '../../../core/models/report.model';
     .report-header{
       display:flex; justify-content:space-between; align-items:center;
       padding:1rem 1.25rem; background:#f8f9ff; border-bottom:1px solid #eee;
+      gap:.75rem;
     }
 
     .badge{ padding:.35rem .9rem; border-radius:20px; font-size:.82rem; font-weight:700; }
     .badge-red  { background:#ffebee; color:#c62828; }
     .badge-green{ background:#e8f5e9; color:#2e7d32; }
+
+    /* ✅ FECHA EN HEADER */
+    .fecha-header{
+      font-size:.8rem;
+      color:#888;
+      flex:1;
+      text-align:center;
+    }
 
     .estado{ font-size:.75rem; font-weight:700; padding:.25rem .7rem; border-radius:12px; }
     .estado-activo  { background:#fff9c4; color:#f57f17; }
@@ -186,10 +195,32 @@ import { ReporteConDetalle } from '../../../core/models/report.model';
     .mascota-info{
       padding:.8rem 1rem; background:#f8f9ff;
       border-radius:10px; margin-bottom:1rem;
+      display:flex; flex-direction:column; gap:.5rem;
     }
 
-    .mascota-info strong{ font-size:1rem; color:#1a237e; }
-    .mascota-info span  { color:#666; font-size:.9rem; }
+    .mascota-row, .dueno-row{
+      display:flex; align-items:center; gap:.4rem; flex-wrap:wrap;
+    }
+
+    .mascota-icon{ font-size:1rem; }
+    .sep{ color:#ccc; }
+
+    .mascota-row strong{ font-size:1rem; color:#1a237e; }
+    .mascota-row span  { color:#666; font-size:.9rem; }
+
+    .dueno-nombre{ font-size:.9rem; color:#333; font-weight:600; }
+
+    .dueno-tel{
+      font-size:.9rem; color:#1a237e; font-weight:700;
+      text-decoration:none;
+    }
+    .dueno-tel:hover{ text-decoration:underline; }
+
+    .btn-whatsapp-small{
+      background:#25d366; color:white;
+      border-radius:6px; padding:.15rem .45rem;
+      font-size:.8rem; text-decoration:none;
+    }
 
     .location{ margin:.5rem 0 1rem; font-size:.9rem; color:#666; }
 
@@ -221,61 +252,6 @@ import { ReporteConDetalle } from '../../../core/models/report.model';
     }
 
     .map-link:hover{ text-decoration:underline; }
-
-    /* ✅ CONTACTO */
-    .contacto-box{
-      background:#f0f7ff;
-      border:1.5px solid #90caf9;
-      border-radius:12px;
-      padding:.9rem 1.1rem;
-      margin-bottom:1rem;
-    }
-
-    .contacto-label{
-      font-size:.8rem;
-      font-weight:700;
-      color:#1565c0;
-      margin-bottom:.5rem;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-
-    .contacto-info{
-      display:flex;
-      align-items:center;
-      gap:.75rem;
-      flex-wrap:wrap;
-    }
-
-    .contacto-nombre{
-      font-weight:600;
-      color:#222;
-      font-size:.95rem;
-    }
-
-    .contacto-telefono{
-      color:#1a237e;
-      font-weight:700;
-      font-size:1rem;
-      text-decoration:none;
-    }
-
-    .contacto-telefono:hover{ text-decoration:underline; }
-
-    .btn-whatsapp{
-      background:#25d366;
-      color:white;
-      border-radius:8px;
-      padding:.35rem .85rem;
-      font-size:.82rem;
-      font-weight:700;
-      text-decoration:none;
-      transition:background .2s;
-    }
-
-    .btn-whatsapp:hover{ background:#1da851; }
-
-    .date{ color:#777; font-size:.82rem; }
 
     .report-actions{ padding:1rem 1.25rem; border-top:1px solid #eee; }
 

@@ -150,8 +150,11 @@ public class BffService {
                     .mascota(mascota)
                     .nombreReporter(nombreReporter)
                     .telefonoReporter(telefonoReporter)
+                    .createdAt(r.get("createdAt") != null
+                            ? java.time.LocalDateTime.parse(
+                            r.get("createdAt").toString())
+                            : null)
                     .build();
-
         }).collect(Collectors.toList());
     }
 

@@ -18,26 +18,43 @@ export class AuthService {
   login(request: AuthRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(tap(r => this.save(r)));
   }
+
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request).pipe(tap(r => this.save(r)));
   }
+
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY); localStorage.removeItem(this.USER_KEY);
-    this.currentUserSubject.next(null); this.router.navigate(['/login']);
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    this.currentUserSubject.next(null);
+    this.router.navigate(['/login']);
   }
+
   getToken(): string | null { return localStorage.getItem(this.TOKEN_KEY); }
   isLoggedIn(): boolean { return !!this.getToken(); }
   getCurrentUser(): AuthResponse | null { return this.currentUserSubject.value; }
+
+  // ✅ Actualizar datos del usuario en memoria y localStorage
+  updateCurrentUser(parcial: Partial<AuthResponse>): void {
+    const current = this.currentUserSubject.value;
+    if (!current) return;
+    const updated = { ...current, ...parcial };
+    localStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+    this.currentUserSubject.next(updated);
+  }
+
   private save(r: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, r.token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(r));
     this.currentUserSubject.next(r);
   }
+
   private loadUser(): AuthResponse | null {
     const raw = localStorage.getItem(this.USER_KEY);
     return raw ? JSON.parse(raw) : null;
   }
+
   isAdmin(): boolean {
-  return this.getCurrentUser()?.rol === 'ADMIN';
-}
+    return this.getCurrentUser()?.rol === 'ADMIN';
+  }
 }

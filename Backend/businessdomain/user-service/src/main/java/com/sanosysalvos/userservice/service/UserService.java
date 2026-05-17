@@ -86,8 +86,14 @@ public class UserService {
         if (dto.getActive() != null) {
             user.setActive(dto.getActive());
         }
+        // ✅ Actualizar contraseña
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
 
         return toDto(userRepository.save(user));
+
+        
     }
 
     public void deleteUser(Long id) {
