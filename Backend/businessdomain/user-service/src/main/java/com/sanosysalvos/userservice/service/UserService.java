@@ -93,7 +93,6 @@ public class UserService {
 
         return toDto(userRepository.save(user));
 
-        
     }
 
     public void deleteUser(Long id) {

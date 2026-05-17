@@ -12,7 +12,8 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
+    hostname: localhost
 
 # ✅ Configuración de Circuit Breaker con Resilience4j
 resilience4j:
