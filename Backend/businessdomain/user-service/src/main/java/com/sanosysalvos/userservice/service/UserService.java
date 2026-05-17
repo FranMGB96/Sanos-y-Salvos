@@ -29,13 +29,14 @@ public class UserService {
                 .nombre(request.getNombre())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .telefono(request.getTelefono())
                 .rol(User.Role.OWNER)
                 .build();
 
         user = userRepository.save(user);
         var details = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtUtil.generateToken(details, user.getId(), user.getRol().name());
-        return new AuthDto.AuthResponse(token, user.getId(), user.getNombre(), user.getEmail(), user.getRol().name());
+        return new AuthDto.AuthResponse(token, user.getId(), user.getNombre(), user.getEmail(), user.getTelefono(), user.getRol().name());
     }
 
     public AuthDto.AuthResponse login(AuthDto.LoginRequest request) {
@@ -43,7 +44,7 @@ public class UserService {
         User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         var details = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtUtil.generateToken(details, user.getId(), user.getRol().name());
-        return new AuthDto.AuthResponse(token, user.getId(), user.getNombre(), user.getEmail(), user.getRol().name());
+        return new AuthDto.AuthResponse(token, user.getId(), user.getNombre(), user.getEmail(), user.getTelefono(), user.getRol().name());
     }
 
     public List<UserDto> getAllUsers() {
@@ -58,12 +59,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + id));
 
-        // Actualizar nombre
         if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
             user.setNombre(dto.getNombre());
         }
 
-        // Actualizar email (verificando que no esté en uso por otro usuario)
         if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
             if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
                 throw new BadRequestException("Email ya en uso");
@@ -71,7 +70,11 @@ public class UserService {
             user.setEmail(dto.getEmail());
         }
 
-        // ✅ Actualizar rol (solo si viene un valor válido)
+        // ✅ Actualizar teléfono
+        if (dto.getTelefono() != null && !dto.getTelefono().isBlank()) {
+            user.setTelefono(dto.getTelefono());
+        }
+
         if (dto.getRol() != null && !dto.getRol().isBlank()) {
             try {
                 user.setRol(User.Role.valueOf(dto.getRol().toUpperCase()));
@@ -80,7 +83,6 @@ public class UserService {
             }
         }
 
-        // ✅ Actualizar estado activo/inactivo
         if (dto.getActive() != null) {
             user.setActive(dto.getActive());
         }
@@ -100,6 +102,7 @@ public class UserService {
                 .id(u.getId())
                 .nombre(u.getNombre())
                 .email(u.getEmail())
+                .telefono(u.getTelefono())
                 .rol(u.getRol().name())
                 .active(u.getActive())
                 .createdAt(u.getCreatedAt())

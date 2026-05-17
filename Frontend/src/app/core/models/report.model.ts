@@ -1,7 +1,5 @@
-
-export type ReportTipo = 'PERDIDO' | 'ENCONTRADO';
-export type ReportEstado = 'ACTIVO' | 'RESUELTO' | 'CERRADO';
-
+export type ReportTipo   = 'PERDIDO' | 'ENCONTRADO';
+export type ReportEstado = 'ACTIVO'  | 'RESUELTO' | 'CERRADO';
 
 export interface Report {
   id?: number;
@@ -26,6 +24,9 @@ export interface ReporteConDetalle extends Report {
     color?: string;
     fotoUrl?: string;
   };
+  // ✅ Teléfono del dueño para poder contactarlo
+  telefonoReporter?: string;
+  nombreReporter?: string;
 }
 
 export interface Dashboard {

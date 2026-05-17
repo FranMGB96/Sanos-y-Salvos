@@ -20,9 +20,7 @@ import { Dashboard } from '../../core/models/report.model';
       </div>
 
       <!-- LOADING -->
-      <div *ngIf="loading" class="loading">
-        Cargando...
-      </div>
+      <div *ngIf="loading" class="loading">Cargando...</div>
 
       <ng-container *ngIf="!loading && dashboard">
 
@@ -31,71 +29,41 @@ import { Dashboard } from '../../core/models/report.model';
 
           <div class="stat-card blue">
             <div class="stat-icon">👤</div>
-
             <div class="stat-info">
-              <span class="stat-value">
-                {{ dashboard.totalUsuarios }}
-              </span>
-
-              <span class="stat-label">
-                Usuarios
-              </span>
+              <span class="stat-value">{{ dashboard.totalUsuarios }}</span>
+              <span class="stat-label">Usuarios</span>
             </div>
           </div>
 
           <div class="stat-card green">
             <div class="stat-icon">🐾</div>
-
             <div class="stat-info">
-              <span class="stat-value">
-                {{ dashboard.totalMascotas }}
-              </span>
-
-              <span class="stat-label">
-                Mascotas
-              </span>
+              <span class="stat-value">{{ dashboard.totalMascotas }}</span>
+              <span class="stat-label">Mascotas</span>
             </div>
           </div>
 
           <div class="stat-card orange">
             <div class="stat-icon">📋</div>
-
             <div class="stat-info">
-              <span class="stat-value">
-                {{ dashboard.reportesActivos }}
-              </span>
-
-              <span class="stat-label">
-                Reportes Activos
-              </span>
+              <span class="stat-value">{{ dashboard.reportesActivos }}</span>
+              <span class="stat-label">Reportes Activos</span>
             </div>
           </div>
 
           <div class="stat-card red">
             <div class="stat-icon">🔍</div>
-
             <div class="stat-info">
-              <span class="stat-value">
-                {{ dashboard.reportesPerdidos }}
-              </span>
-
-              <span class="stat-label">
-                Perdidos
-              </span>
+              <span class="stat-value">{{ dashboard.reportesPerdidos }}</span>
+              <span class="stat-label">Perdidos</span>
             </div>
           </div>
 
           <div class="stat-card teal">
             <div class="stat-icon">✅</div>
-
             <div class="stat-info">
-              <span class="stat-value">
-                {{ dashboard.reportesEncontrados }}
-              </span>
-
-              <span class="stat-label">
-                Encontrados
-              </span>
+              <span class="stat-value">{{ dashboard.reportesEncontrados }}</span>
+              <span class="stat-label">Encontrados</span>
             </div>
           </div>
 
@@ -103,21 +71,8 @@ import { Dashboard } from '../../core/models/report.model';
 
         <!-- BOTONES -->
         <div class="quick-actions">
-
-          <a
-            routerLink="/pets/new"
-            class="action-btn"
-          >
-            + Nueva Mascota
-          </a>
-
-          <a
-            routerLink="/reports/new"
-            class="action-btn secondary"
-          >
-            + Nuevo Reporte
-          </a>
-
+          <a routerLink="/pets/new"    class="action-btn">+ Nueva Mascota</a>
+          <a routerLink="/reports/new" class="action-btn secondary">+ Nuevo Reporte</a>
         </div>
 
         <!-- REPORTES -->
@@ -130,52 +85,28 @@ import { Dashboard } from '../../core/models/report.model';
             *ngIf="dashboard.ultimosReportes.length > 0; else noReports"
           >
 
-            <div
-              class="report-card"
-              *ngFor="let r of dashboard.ultimosReportes"
-            >
+            <div class="report-card" *ngFor="let r of dashboard.ultimosReportes">
 
               <!-- TOP -->
               <div class="report-top">
-
-                <div
-                  class="report-badge"
-                  [class]="r.tipo === 'PERDIDO'
-                    ? 'badge-red'
-                    : 'badge-green'"
-                >
+                <div class="report-badge" [class]="r.tipo === 'PERDIDO' ? 'badge-red' : 'badge-green'">
                   {{ r.tipo }}
                 </div>
-
-                <div
-                  class="report-estado"
-                  [class]="'estado-' + r.estado?.toLowerCase()"
-                >
+                <div class="report-estado" [class]="'estado-' + r.estado?.toLowerCase()">
                   {{ r.estado }}
                 </div>
-
               </div>
 
               <!-- TEXTO -->
               <div class="report-body">
 
-                <p class="report-desc">
-                  {{ r.descripcion }}
+                <p class="report-desc">{{ r.descripcion }}</p>
+
+                <p class="report-pet" *ngIf="r.mascota">
+                  🐾 {{ r.mascota.nombre }} ({{ r.mascota.especie }})
                 </p>
 
-                <p
-                  class="report-pet"
-                  *ngIf="r.mascota"
-                >
-                  🐾
-                  {{ r.mascota.nombre }}
-                  ({{ r.mascota.especie }})
-                </p>
-
-                <p
-                  class="report-loc"
-                  *ngIf="r.ubicacionDescripcion"
-                >
+                <p class="report-loc" *ngIf="r.ubicacionDescripcion">
                   📍 {{ r.ubicacionDescripcion }}
                 </p>
 
@@ -185,32 +116,41 @@ import { Dashboard } from '../../core/models/report.model';
               <div class="report-images">
 
                 <!-- FOTO -->
-                <img
-                  *ngIf="r.mascota?.fotoUrl"
-                  [src]="r.mascota?.fotoUrl"
-                  class="pet-image"
-                  alt="Mascota"
-                >
+                <div class="pet-image-wrapper" *ngIf="r.mascota?.fotoUrl">
+                  <img [src]="r.mascota?.fotoUrl" class="pet-image" alt="Mascota">
+                </div>
 
                 <!-- MAPA -->
-                <div
-                  class="map-container"
-                  *ngIf="r.latitud && r.longitud"
-                >
-
+                <div class="map-container" *ngIf="r.latitud && r.longitud">
                   <img
                     [src]="getStaticMap(r.latitud, r.longitud)"
                     class="map-image"
                     alt="Mapa"
                   >
-
-                  <!-- PIN -->
-                  <div class="map-pin">
-                    📍
+                  <!-- PIN igual que report-list -->
+                  <div class="paw-marker">
+                    <span>🐾</span>
                   </div>
-
                 </div>
 
+              </div>
+
+              <!-- ✅ CONTACTO -->
+              <div class="contacto-box" *ngIf="r.telefonoReporter">
+                <div class="contacto-label">📞 Contactar al dueño</div>
+                <div class="contacto-info">
+                  <span class="contacto-nombre" *ngIf="r.nombreReporter">{{ r.nombreReporter }}</span>
+                  <a [href]="'tel:' + r.telefonoReporter" class="contacto-telefono">
+                    {{ r.telefonoReporter }}
+                  </a>
+                  <a
+                    [href]="'https://wa.me/56' + r.telefonoReporter"
+                    target="_blank"
+                    class="btn-whatsapp"
+                  >
+                    💬 WhatsApp
+                  </a>
+                </div>
               </div>
 
             </div>
@@ -218,14 +158,9 @@ import { Dashboard } from '../../core/models/report.model';
           </div>
 
           <ng-template #noReports>
-
             <p class="empty">
-              No hay reportes.
-              <a routerLink="/reports/new">
-                Crear uno
-              </a>
+              No hay reportes. <a routerLink="/reports/new">Crear uno</a>
             </p>
-
           </ng-template>
 
         </div>
@@ -237,35 +172,15 @@ import { Dashboard } from '../../core/models/report.model';
 
   styles: [`
 
-    .page{
-      padding:2rem;
-      max-width:1200px;
-      margin:0 auto;
-    }
+    .page{ padding:2rem; max-width:1200px; margin:0 auto; }
 
-    .page-header{
-      margin-bottom:2rem;
-    }
+    .page-header{ margin-bottom:2rem; }
+    .page-header h1{ font-size:2rem; color:#1a237e; margin:0 0 .3rem; }
+    .page-header p { color:#666; margin:0; }
 
-    .page-header h1{
-      font-size:2rem;
-      color:#1a237e;
-      margin:0 0 .3rem;
-    }
-
-    .page-header p{
-      color:#666;
-      margin:0;
-    }
-
-    .loading{
-      text-align:center;
-      padding:3rem;
-      color:#666;
-    }
+    .loading{ text-align:center; padding:3rem; color:#666; }
 
     /* STATS */
-
     .stats-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -274,287 +189,174 @@ import { Dashboard } from '../../core/models/report.model';
     }
 
     .stat-card{
-      display:flex;
-      align-items:center;
-      gap:1rem;
-      padding:1.25rem;
-      border-radius:14px;
-      color:white;
+      display:flex; align-items:center; gap:1rem;
+      padding:1.25rem; border-radius:14px; color:white;
     }
 
-    .stat-card.blue{
-      background:linear-gradient(135deg,#1a237e,#3949ab);
-    }
+    .stat-card.blue  { background:linear-gradient(135deg,#1a237e,#3949ab); }
+    .stat-card.green { background:linear-gradient(135deg,#2e7d32,#43a047); }
+    .stat-card.orange{ background:linear-gradient(135deg,#e65100,#fb8c00); }
+    .stat-card.red   { background:linear-gradient(135deg,#b71c1c,#e53935); }
+    .stat-card.teal  { background:linear-gradient(135deg,#00695c,#00897b); }
 
-    .stat-card.green{
-      background:linear-gradient(135deg,#2e7d32,#43a047);
-    }
-
-    .stat-card.orange{
-      background:linear-gradient(135deg,#e65100,#fb8c00);
-    }
-
-    .stat-card.red{
-      background:linear-gradient(135deg,#b71c1c,#e53935);
-    }
-
-    .stat-card.teal{
-      background:linear-gradient(135deg,#00695c,#00897b);
-    }
-
-    .stat-icon{
-      font-size:2rem;
-    }
-
-    .stat-value{
-      display:block;
-      font-size:2rem;
-      font-weight:700;
-      line-height:1;
-    }
-
-    .stat-label{
-      font-size:.85rem;
-      opacity:.9;
-    }
+    .stat-icon { font-size:2rem; }
+    .stat-value{ display:block; font-size:2rem; font-weight:700; line-height:1; }
+    .stat-label{ font-size:.85rem; opacity:.9; }
 
     /* BOTONES */
-
-    .quick-actions{
-      display:flex;
-      gap:1rem;
-      margin-bottom:2rem;
-    }
+    .quick-actions{ display:flex; gap:1rem; margin-bottom:2rem; }
 
     .action-btn{
-      padding:.8rem 1.5rem;
-      border-radius:10px;
-      font-weight:600;
-      text-decoration:none;
-      font-size:.95rem;
-      background:#1a237e;
-      color:white;
+      padding:.8rem 1.5rem; border-radius:10px; font-weight:600;
+      text-decoration:none; font-size:.95rem; background:#1a237e; color:white;
     }
 
     .action-btn.secondary{
-      background:white;
-      color:#1a237e;
-      border:2px solid #1a237e;
+      background:white; color:#1a237e; border:2px solid #1a237e;
     }
 
     /* SECTION */
+    .section h2{ font-size:1.5rem; color:#222; margin-bottom:1rem; }
 
-    .section h2{
-      font-size:1.5rem;
-      color:#222;
-      margin-bottom:1rem;
-    }
-
-    .reports-list{
-      display:flex;
-      flex-direction:column;
-      gap:1rem;
-    }
+    .reports-list{ display:flex; flex-direction:column; gap:1rem; }
 
     /* CARD */
-
     .report-card{
-      background:white;
-
-      border-radius:18px;
-
-      padding:1rem;
-
-      box-shadow:
-        0 2px 8px rgba(0,0,0,.06),
-        0 8px 20px rgba(0,0,0,.05);
-
-      display:flex;
-      flex-direction:column;
-      gap:1rem;
+      background:white; border-radius:18px; padding:1rem;
+      box-shadow:0 2px 8px rgba(0,0,0,.06), 0 8px 20px rgba(0,0,0,.05);
+      display:flex; flex-direction:column; gap:1rem;
     }
 
     /* TOP */
-
-    .report-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-    }
+    .report-top{ display:flex; justify-content:space-between; align-items:flex-start; }
 
     .report-badge{
-      padding:.35rem .9rem;
-      border-radius:20px;
-      font-size:.75rem;
-      font-weight:700;
-      white-space:nowrap;
+      padding:.35rem .9rem; border-radius:20px;
+      font-size:.75rem; font-weight:700; white-space:nowrap;
     }
 
-    .badge-red{
-      background:#ffebee;
-      color:#c62828;
-    }
-
-    .badge-green{
-      background:#e8f5e9;
-      color:#2e7d32;
-    }
+    .badge-red  { background:#ffebee; color:#c62828; }
+    .badge-green{ background:#e8f5e9; color:#2e7d32; }
 
     /* BODY */
+    .report-body{ display:flex; flex-direction:column; gap:.4rem; }
 
-    .report-body{
-      display:flex;
-      flex-direction:column;
-      gap:.4rem;
-    }
-
-    .report-desc{
-      margin:0;
-      font-size:1.05rem;
-      color:#222;
-      font-weight:600;
-      line-height:1.4;
-    }
-
-    .report-pet{
-      margin:0;
-      font-size:.92rem;
-      color:#555;
-    }
-
-    .report-loc{
-      margin:0;
-      font-size:.9rem;
-      color:#666;
-      line-height:1.5;
-    }
+    .report-desc{ margin:0; font-size:1.05rem; color:#222; font-weight:600; line-height:1.4; }
+    .report-pet { margin:0; font-size:.92rem; color:#555; }
+    .report-loc { margin:0; font-size:.9rem;  color:#666; line-height:1.5; }
 
     /* IMAGENES */
-
-    .report-images{
-      display:flex;
-      gap:1rem;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+    .report-images{ display:flex; gap:1rem; flex-wrap:wrap; align-items:stretch; }
 
     /* FOTO */
+    .pet-image-wrapper{
+      width:190px; height:140px;
+      border-radius:16px; border:1px solid #e5e5e5;
+      background:#f5f5f5; box-shadow:0 2px 8px rgba(0,0,0,.08);
+      overflow:hidden; display:flex; align-items:center;
+      justify-content:center; flex-shrink:0;
+    }
 
     .pet-image{
-      width:190px;
-      height:140px;
-
-      object-fit:cover;
-      object-position:center center;
-
-      border-radius:16px;
-
-      border:1px solid #e5e5e5;
-
-      background:#f5f5f5;
-
-      display:block;
-
-      box-shadow:0 2px 8px rgba(0,0,0,.08);
+      width:100%; height:100%;
+      object-fit:contain; object-position:center;
+      display:block; padding:4px; box-sizing:border-box;
     }
 
     /* MAPA */
-
-    .map-container{
-      position:relative;
-      display:inline-block;
-    }
+    .map-container{ position:relative; display:inline-block; flex-shrink:0; }
 
     .map-image{
-      width:300px;
-      height:140px;
-
-      object-fit:cover;
-
-      border-radius:16px;
-
-      border:1px solid #dcdcdc;
-
-      background:#f5f5f5;
-
-      display:block;
-
+      width:300px; height:140px; object-fit:cover;
+      border-radius:16px; border:1px solid #dcdcdc;
+      background:#f5f5f5; display:block;
       box-shadow:0 2px 8px rgba(0,0,0,.08);
     }
 
-    /* PIN */
-
-    .map-pin{
-      position:absolute;
-
-      top:50%;
-      left:50%;
-
-      transform:translate(-50%, -100%);
-
-      font-size:2rem;
-
-      filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));
-
-      pointer-events:none;
+    /* PIN — igual que report-list */
+    .paw-marker{
+      position:absolute; top:50%; left:50%;
+      width:42px; height:42px;
+      background:#ea4335; border-radius:50% 50% 50% 0;
+      transform:translate(-50%, -100%) rotate(-45deg);
+      border:3px solid white; box-shadow:0 3px 10px rgba(0,0,0,.35);
+      display:flex; align-items:center; justify-content:center;
     }
 
-    /* ESTADO */
+    .paw-marker span{ transform:rotate(45deg); font-size:18px; line-height:1; }
 
-    .report-estado{
-      font-size:.75rem;
+    /* ✅ CONTACTO */
+    .contacto-box{
+      background:#f0f7ff;
+      border:1.5px solid #90caf9;
+      border-radius:12px;
+      padding:.9rem 1.1rem;
+    }
+
+    .contacto-label{
+      font-size:.8rem;
       font-weight:700;
-      padding:.35rem .8rem;
-      border-radius:20px;
-      white-space:nowrap;
+      color:#1565c0;
+      margin-bottom:.5rem;
+      text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
-    .estado-activo{
-      background:#fff3cd;
-      color:#f57f17;
+    .contacto-info{
+      display:flex;
+      align-items:center;
+      gap:.75rem;
+      flex-wrap:wrap;
     }
 
-    .estado-resuelto{
-      background:#e8f5e9;
-      color:#2e7d32;
-    }
-
-    .estado-cerrado{
-      background:#f5f5f5;
-      color:#757575;
-    }
-
-    .empty{
-      color:#999;
+    .contacto-nombre{
+      font-weight:600;
+      color:#222;
       font-size:.95rem;
     }
 
+    .contacto-telefono{
+      color:#1a237e;
+      font-weight:700;
+      font-size:1rem;
+      text-decoration:none;
+    }
+
+    .contacto-telefono:hover{ text-decoration:underline; }
+
+    .btn-whatsapp{
+      background:#25d366;
+      color:white;
+      border-radius:8px;
+      padding:.35rem .85rem;
+      font-size:.82rem;
+      font-weight:700;
+      text-decoration:none;
+      transition:background .2s;
+    }
+
+    .btn-whatsapp:hover{ background:#1da851; }
+
+    /* ESTADO */
+    .report-estado{
+      font-size:.75rem; font-weight:700;
+      padding:.35rem .8rem; border-radius:20px; white-space:nowrap;
+    }
+
+    .estado-activo  { background:#fff3cd; color:#f57f17; }
+    .estado-resuelto{ background:#e8f5e9; color:#2e7d32; }
+    .estado-cerrado { background:#f5f5f5; color:#757575; }
+
+    .empty{ color:#999; font-size:.95rem; }
+
     /* MOBILE */
-
     @media(max-width:768px){
-
-      .page{
-        padding:1rem;
-      }
-
-      .quick-actions{
-        flex-direction:column;
-      }
-
-      .action-btn{
-        text-align:center;
-      }
-
-      .report-images{
-        flex-direction:column;
-      }
-
-      .pet-image,
-      .map-image{
-        width:100%;
-        height:220px;
-      }
-
+      .page{ padding:1rem; }
+      .quick-actions{ flex-direction:column; }
+      .action-btn{ text-align:center; }
+      .report-images{ flex-direction:column; }
+      .pet-image-wrapper{ width:100%; height:220px; }
+      .map-image{ width:100%; height:220px; }
     }
 
   `]
@@ -563,38 +365,18 @@ import { Dashboard } from '../../core/models/report.model';
 export class DashboardComponent implements OnInit {
 
   dashboard: Dashboard | null = null;
-
   loading = true;
 
-  constructor(
-    private reportService: ReportService
-  ) {}
+  constructor(private reportService: ReportService) {}
 
   ngOnInit() {
-
-    this.reportService
-      .getDashboard()
-      .subscribe({
-
-        next: d => {
-
-          this.dashboard = d;
-          this.loading = false;
-        },
-
-        error: () => {
-
-          this.loading = false;
-        }
-      });
+    this.reportService.getDashboard().subscribe({
+      next: d => { this.dashboard = d; this.loading = false; },
+      error: () => { this.loading = false; }
+    });
   }
 
-  // MAPA ESTATICO CON MAS ZOOM
-  getStaticMap(
-    lat: number,
-    lng: number
-  ): string {
-
+  getStaticMap(lat: number, lng: number): string {
     return `https://maps.wikimedia.org/img/osm-intl,17,${lat},${lng},800x400.png`;
   }
 }

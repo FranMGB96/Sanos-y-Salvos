@@ -17,8 +17,8 @@ public class BffService {
 
     @Autowired private RestTemplate restTemplate;
 
-    @Value("${services.user-url}") private String userUrl;
-    @Value("${services.pet-url}")  private String petUrl;
+    @Value("${services.user-url}")   private String userUrl;
+    @Value("${services.pet-url}")    private String petUrl;
     @Value("${services.report-url}") private String reportUrl;
 
     // ── Dashboard ─────────────────────────────────────────────────────────────
@@ -45,7 +45,6 @@ public class BffService {
                 .ultimosReportes(ultimos).build();
     }
 
-    // Fallback: si el dashboard falla, retorna datos vacíos con ceros
     public DashboardDto dashboardFallback(Exception ex) {
         return DashboardDto.builder()
                 .totalUsuarios(0).totalMascotas(0).totalReportes(0)
@@ -68,7 +67,6 @@ public class BffService {
                 .mascotas(mascotas).build();
     }
 
-    // Fallback: retorna usuario con datos mínimos y sin mascotas
     public UsuarioConMascotasDto usuarioFallback(Long userId, Exception ex) {
         return UsuarioConMascotasDto.builder()
                 .id(userId)
@@ -96,31 +94,50 @@ public class BffService {
         return enriquecer(fetchList(reportUrl + "/reports/usuario/" + userId, java.util.Map.class));
     }
 
-    // Fallback: lista vacía cuando el servicio de reportes no responde
     public List<ReporteConDetalleDto> reportesFallback(Exception ex) {
         return Collections.emptyList();
     }
 
-    // Fallback con parámetro String (para getReportesPorTipo)
     public List<ReporteConDetalleDto> reportesFallback(String param, Exception ex) {
         return Collections.emptyList();
     }
 
-    // Fallback con parámetro Long (para getReportesPorUsuario)
     public List<ReporteConDetalleDto> reportesFallback(Long param, Exception ex) {
         return Collections.emptyList();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    @SuppressWarnings("unchecked")
     private List<ReporteConDetalleDto> enriquecer(List<java.util.Map> rawList) {
         return rawList.stream().map(r -> {
+
+            // Mascota
             Long petId = r.get("petId") != null ? Long.valueOf(r.get("petId").toString()) : null;
             MascotaResumenDto mascota = null;
             if (petId != null) {
                 try { mascota = restTemplate.getForObject(petUrl + "/pets/" + petId, MascotaResumenDto.class); }
                 catch (Exception ignored) {}
             }
+
+            // ✅ Dueño — nombre y teléfono
+            Long reporterUserId = r.get("reporterUserId") != null
+                    ? Long.valueOf(r.get("reporterUserId").toString()) : null;
+
+            String nombreReporter   = null;
+            String telefonoReporter = null;
+
+            if (reporterUserId != null) {
+                try {
+                    Map<?, ?> usuario = restTemplate.getForObject(
+                            userUrl + "/users/" + reporterUserId, Map.class);
+                    if (usuario != null) {
+                        nombreReporter   = (String) usuario.get("nombre");
+                        telefonoReporter = (String) usuario.get("telefono");
+                    }
+                } catch (Exception ignored) {}
+            }
+
             return ReporteConDetalleDto.builder()
                     .id(Long.valueOf(r.get("id").toString()))
                     .tipo((String) r.get("tipo"))
@@ -129,15 +146,20 @@ public class BffService {
                     .longitud(r.get("longitud")  != null ? Double.valueOf(r.get("longitud").toString()) : null)
                     .ubicacionDescripcion((String) r.get("ubicacionDescripcion"))
                     .estado((String) r.get("estado"))
-                    .reporterUserId(r.get("reporterUserId") != null ? Long.valueOf(r.get("reporterUserId").toString()) : null)
-                    .mascota(mascota).build();
+                    .reporterUserId(reporterUserId)
+                    .mascota(mascota)
+                    .nombreReporter(nombreReporter)
+                    .telefonoReporter(telefonoReporter)
+                    .build();
+
         }).collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
     private <T> List<T> fetchList(String url, Class<T> clazz) {
         try {
-            var response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<T>>() {});
+            var response = restTemplate.exchange(url, HttpMethod.GET, null,
+                    new ParameterizedTypeReference<List<T>>() {});
             return response.getBody() != null ? response.getBody() : Collections.emptyList();
         } catch (Exception e) { return Collections.emptyList(); }
     }

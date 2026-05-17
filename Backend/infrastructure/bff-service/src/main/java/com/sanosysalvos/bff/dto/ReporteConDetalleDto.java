@@ -15,4 +15,6 @@ public class ReporteConDetalleDto {
     private Long reporterUserId;
     private LocalDateTime createdAt;
     private MascotaResumenDto mascota;
+    private String nombreReporter;
+    private String telefonoReporter;
 }

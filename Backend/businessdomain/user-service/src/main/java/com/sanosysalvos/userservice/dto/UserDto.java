@@ -8,6 +8,7 @@ public class UserDto {
     private Long id;
     private String nombre;
     private String email;
+    private String telefono;
     private String rol;
     private Boolean active;
     private LocalDateTime createdAt;

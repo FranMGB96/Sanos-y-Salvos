@@ -11,6 +11,7 @@ public class User {
     @NotBlank @Column(nullable = false) private String nombre;
     @Email @NotBlank @Column(nullable = false, unique = true) private String email;
     @NotBlank @Column(nullable = false) private String password;
+    @NotBlank @Column(nullable = false) private String telefono;
     @Enumerated(EnumType.STRING) @Column(nullable = false) @Builder.Default private Role rol = Role.OWNER;
     @Column(name = "created_at", updatable = false) @Builder.Default private LocalDateTime createdAt = LocalDateTime.now();
     @Builder.Default private Boolean active = true;
