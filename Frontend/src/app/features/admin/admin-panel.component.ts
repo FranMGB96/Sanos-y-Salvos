@@ -63,6 +63,7 @@ import { Router } from '@angular/router';
               <th>ID</th>
               <th>Nombre</th>
               <th>Email</th>
+              <th>Teléfono</th>
               <th>Rol</th>
               <th>Estado</th>
               <th>Registro</th>
@@ -77,6 +78,7 @@ import { Router } from '@angular/router';
                 <td>{{ u.id }}</td>
                 <td>{{ u.nombre }}</td>
                 <td>{{ u.email }}</td>
+                <td>{{ u.telefono || '—' }}</td>
                 <td><span class="badge" [class.badge-admin]="u.rol==='ADMIN'">{{ u.rol }}</span></td>
                 <td>
                   <span class="badge" [class.badge-active]="u.active" [class.badge-inactive]="!u.active">
@@ -107,6 +109,10 @@ import { Router } from '@angular/router';
                 </td>
                 <td>
                   <input class="input-edit" [(ngModel)]="edicionEmail" placeholder="Email" type="email" />
+                </td>
+                <!-- ✅ TELÉFONO EDITABLE -->
+                <td>
+                  <input class="input-edit" [(ngModel)]="edicionTelefono" placeholder="Teléfono" type="tel" />
                 </td>
                 <td>
                   <select class="select-edit" [(ngModel)]="edicionRol"
@@ -275,7 +281,6 @@ import { Router } from '@angular/router';
 
     .loading{ text-align:center; padding:2rem; color:#999 }
 
-    /* Toast */
     .toast{ position:fixed; bottom:2rem; right:2rem; background:#1a237e; color:white; padding:.85rem 1.4rem; border-radius:10px; font-size:.9rem; font-weight:600; box-shadow:0 4px 20px rgba(0,0,0,.2); opacity:0; transform:translateY(10px); transition:opacity .3s, transform .3s; pointer-events:none; z-index:999 }
     .toast-visible{ opacity:1; transform:translateY(0) }
     .toast-error{ background:#c62828 }
@@ -300,10 +305,11 @@ export class AdminPanelComponent implements OnInit {
 
   // ── Edición de usuario ──────────────────────────────────────
   editandoUsuarioId: number | null = null;
-  edicionNombre = '';
-  edicionEmail  = '';
-  edicionRol    = '';
-  guardando     = false;
+  edicionNombre   = '';
+  edicionEmail    = '';
+  edicionTelefono = ''; // ✅ NUEVO
+  edicionRol      = '';
+  guardando       = false;
 
   // ── Toast ───────────────────────────────────────────────────
   toastMsg     = '';
@@ -364,9 +370,10 @@ export class AdminPanelComponent implements OnInit {
 
   iniciarEdicion(u: any) {
     this.editandoUsuarioId = u.id;
-    this.edicionNombre = u.nombre;
-    this.edicionEmail  = u.email;
-    this.edicionRol    = u.rol;
+    this.edicionNombre   = u.nombre;
+    this.edicionEmail    = u.email;
+    this.edicionTelefono = u.telefono || ''; // ✅ NUEVO
+    this.edicionRol      = u.rol;
   }
 
   cancelarEdicion() {
@@ -376,15 +383,15 @@ export class AdminPanelComponent implements OnInit {
   guardarEdicion(u: any) {
     this.guardando = true;
     const payload = {
-      nombre: this.edicionNombre,
-      email:  this.edicionEmail,
-      rol:    this.edicionRol,
-      active: u.active
+      nombre:   this.edicionNombre,
+      email:    this.edicionEmail,
+      telefono: this.edicionTelefono, // ✅ NUEVO
+      rol:      this.edicionRol,
+      active:   u.active
     };
 
     this.http.put<any>(`${environment.apiUrl}/users/${u.id}`, payload).subscribe({
       next: (actualizado) => {
-        // Reflejar cambios en la lista sin recargar todo
         const idx = this.usuarios.findIndex(x => x.id === u.id);
         if (idx !== -1) this.usuarios[idx] = actualizado;
         this.editandoUsuarioId = null;
@@ -449,7 +456,6 @@ export class AdminPanelComponent implements OnInit {
         this.showToast(`✅ Estado cambiado a ${r.estado}`);
       },
       error: () => {
-        // Revertir el select al valor anterior
         event.target.value = estadoAnterior;
         this.showToast('Error al cambiar el estado', true);
       }
