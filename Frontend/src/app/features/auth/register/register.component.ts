@@ -37,6 +37,6 @@ export class RegisterComponent {
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true; this.errorMsg = '';
-    this.auth.register(this.form.value).subscribe({ next: () => this.router.navigate(['/dashboard']), error: (e: any) => { this.errorMsg = e.error?.message || 'Error al registrar.'; this.loading = false; } });
+    this.auth.register(this.form.value).subscribe({ next: () => this.router.navigate(['/inicio']), error: (e: any) => { this.errorMsg = e.error?.message || 'Error al registrar.'; this.loading = false; } });
   }
 }

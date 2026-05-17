@@ -30,6 +30,6 @@ export class LoginComponent {
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true; this.errorMsg = '';
-    this.auth.login(this.form.value).subscribe({ next: () => this.router.navigate(['/dashboard']), error: () => { this.errorMsg = 'Email o contraseña incorrectos'; this.loading = false; } });
+    this.auth.login(this.form.value).subscribe({ next: () => this.router.navigate(['/inicio']), error: () => { this.errorMsg = 'Email o contraseña incorrectos'; this.loading = false; } });
   }
 }
