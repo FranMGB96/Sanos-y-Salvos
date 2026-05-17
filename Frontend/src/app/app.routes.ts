@@ -12,5 +12,10 @@ export const routes: Routes = [
   { path: 'reports',   canActivate: [authGuard], loadComponent: () => import('./features/reports/report-list/report-list.component').then(m => m.ReportListComponent) },
   { path: 'reports/new', canActivate: [authGuard], loadComponent: () => import('./features/reports/report-form/report-form.component').then(m => m.ReportFormComponent) },
   { path: 'nosotros',   loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent) },
+  { 
+  path: 'admin', 
+  canActivate: [authGuard], 
+  loadComponent: () => import('./features/admin/admin-panel.component').then(m => m.AdminPanelComponent) 
+},
   { path: '**', redirectTo: 'inicio' },
 ];

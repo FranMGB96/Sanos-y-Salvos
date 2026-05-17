@@ -37,4 +37,7 @@ export class AuthService {
     const raw = localStorage.getItem(this.USER_KEY);
     return raw ? JSON.parse(raw) : null;
   }
+  isAdmin(): boolean {
+  return this.getCurrentUser()?.rol === 'ADMIN';
+}
 }
