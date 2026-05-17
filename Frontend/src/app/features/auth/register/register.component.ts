@@ -14,13 +14,6 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="field"><label>Nombre completo</label><input type="text" formControlName="nombre" placeholder="Tu nombre"></div>
           <div class="field"><label>Email</label><input type="email" formControlName="email" placeholder="tu@email.com"></div>
           <div class="field"><label>Contraseña</label><input type="password" formControlName="password" placeholder="Mínimo 6 caracteres"></div>
-          <div class="field"><label>Tipo de cuenta</label>
-            <select formControlName="rol">
-              <option value="OWNER">Dueño de mascota</option>
-              <option value="CITIZEN">Ciudadano</option>
-              <option value="ORG">Organización rescatista</option>
-            </select>
-          </div>
           <div class="alert" *ngIf="errorMsg">{{ errorMsg }}</div>
           <button type="submit" [disabled]="loading">{{ loading ? 'Registrando...' : 'Registrarse' }}</button>
         </form>
@@ -32,7 +25,7 @@ import { AuthService } from '../../../core/services/auth.service';
 export class RegisterComponent {
   form: FormGroup; loading = false; errorMsg = '';
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
-    this.form = this.fb.group({ nombre: ['', Validators.required], email: ['', [Validators.required, Validators.email]], password: ['', [Validators.required, Validators.minLength(6)]], rol: ['OWNER'] });
+    this.form = this.fb.group({ nombre: ['', Validators.required], email: ['', [Validators.required, Validators.email]], password: ['', [Validators.required, Validators.minLength(6)]] });
   }
   onSubmit() {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
