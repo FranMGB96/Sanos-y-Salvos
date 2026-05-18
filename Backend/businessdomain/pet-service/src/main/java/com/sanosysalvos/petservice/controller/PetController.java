@@ -82,8 +82,9 @@ public class PetController {
             @RequestParam(value = "tamanio", required = false) String tamanio,
             @RequestParam(value = "descripcion", required = false) String descripcion,
             @RequestParam(value = "foto", required = false) MultipartFile foto,
-            @RequestHeader("X-User-Id") String requestingUserId,
-            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
+            @RequestHeader(value = "X-User-Id", defaultValue = "0") String requestingUserId,
+            // rol con default
+            @RequestHeader(value = "X-User-Role", defaultValue = "ADMIN") String requestingUserRole
     ) throws IOException {
 
         String fotoUrl = procesarFoto(foto);
@@ -105,8 +106,9 @@ public class PetController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @RequestHeader("X-User-Id") String requestingUserId,
-            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
+            @RequestHeader(value = "X-User-Id", defaultValue = "0") String requestingUserId,
+            // rol con default
+            @RequestHeader(value = "X-User-Role", defaultValue = "ADMIN") String requestingUserRole
     ) {
         petService.deletePet(id, Long.parseLong(requestingUserId), requestingUserRole);
         return ResponseEntity.noContent().build();
@@ -115,7 +117,7 @@ public class PetController {
     // ── Método privado para procesar foto ────────────────────────────
 
     private String procesarFoto(MultipartFile foto) throws IOException {
-        if (foto == null || foto.isEmpty()) return "";
+        if (foto == null || foto.isEmpty()) return null;
 
         String carpetaUploads = System.getProperty("user.dir") + "/uploads/";
         File carpeta = new File(carpetaUploads);
@@ -125,6 +127,10 @@ public class PetController {
         Path rutaArchivo = Paths.get(carpetaUploads + nombreArchivo);
         Files.write(rutaArchivo, foto.getBytes());
 
-        return "http://localhost:8082/uploads/" + nombreArchivo;
+        String baseUrl = System.getenv("PET_SERVICE_BASE_URL") != null
+                ? System.getenv("PET_SERVICE_BASE_URL")
+                : "http://localhost:8082";
+
+        return baseUrl + "/uploads/" + nombreArchivo;
     }
 }

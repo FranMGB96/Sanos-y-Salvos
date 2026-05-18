@@ -62,7 +62,7 @@ public class PetService {
         if (dto.getRaza()        != null) pet.setRaza(dto.getRaza());
         if (dto.getColor()       != null) pet.setColor(dto.getColor());
         if (dto.getTamanio()     != null) pet.setTamanio(parseTamanio(dto.getTamanio()));
-        if (dto.getFotoUrl()     != null && !dto.getFotoUrl().isEmpty()) pet.setFotoUrl(dto.getFotoUrl());
+        if (dto.getFotoUrl() != null && !dto.getFotoUrl().isEmpty()) pet.setFotoUrl(dto.getFotoUrl());
         if (dto.getDescripcion() != null) pet.setDescripcion(dto.getDescripcion());
 
         return toDto(petRepository.save(pet));

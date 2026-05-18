@@ -57,8 +57,8 @@ public class ReportController {
     public ResponseEntity<ReportDto> update(
             @PathVariable Long id,
             @RequestBody ReportDto dto,
-            @RequestHeader("X-User-Id") String requestingUserId,
-            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
+            @RequestHeader(value = "X-User-Id", defaultValue = "0") String requestingUserId,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ADMIN") String requestingUserRole
     ) {
         return ResponseEntity.ok(
                 reportService.updateReport(id, dto, Long.parseLong(requestingUserId), requestingUserRole)
@@ -69,8 +69,8 @@ public class ReportController {
     public ResponseEntity<ReportDto> updateEstado(
             @PathVariable Long id,
             @RequestParam String estado,
-            @RequestHeader("X-User-Id") String requestingUserId,
-            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
+            @RequestHeader(value = "X-User-Id", defaultValue = "0") String requestingUserId,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ADMIN") String requestingUserRole
     ) {
         return ResponseEntity.ok(
                 reportService.updateEstado(id, estado, Long.parseLong(requestingUserId), requestingUserRole)
@@ -80,8 +80,8 @@ public class ReportController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
-            @RequestHeader("X-User-Id") String requestingUserId,
-            @RequestHeader("X-User-Role") String requestingUserRole  // ✅ nuevo
+            @RequestHeader(value = "X-User-Id", defaultValue = "0") String requestingUserId,
+            @RequestHeader(value = "X-User-Role", defaultValue = "ADMIN") String requestingUserRole
     ) {
         reportService.deleteReport(id, Long.parseLong(requestingUserId), requestingUserRole);
         return ResponseEntity.noContent().build();

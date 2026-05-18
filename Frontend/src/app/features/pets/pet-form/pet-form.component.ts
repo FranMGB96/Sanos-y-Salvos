@@ -91,14 +91,27 @@ import { AuthService } from '../../../core/services/auth.service';
 
               <label>Foto de la mascota</label>
 
-              <input
-                type="file"
-                accept="image/*"
-                (change)="onFileSelected($event)"
-              >
+              <div class="upload-zone"
+                   [class.has-image]="previewUrl"
+                   (click)="fileInput.click()"
+                   (dragover)="$event.preventDefault()"
+                   (drop)="onDrop($event)">
 
-              <div *ngIf="previewUrl" class="preview-container">
-                <img [src]="previewUrl" class="preview-img">
+                <input #fileInput type="file" accept="image/*"
+                       (change)="onFileSelected($event)" style="display:none">
+
+                <ng-container *ngIf="!previewUrl">
+                  <div class="upload-icon">📷</div>
+                  <p class="upload-text">Haz clic o arrastra una foto aquí</p>
+                  <p class="upload-hint">PNG, JPG — máx. 5 MB</p>
+                </ng-container>
+
+                <ng-container *ngIf="previewUrl">
+                  <img [src]="previewUrl" class="preview-img-zone">
+                  <button type="button" class="btn-remove-photo"
+                          (click)="removePhoto($event)">✕ Cambiar foto</button>
+                </ng-container>
+
               </div>
 
             </div>
@@ -210,20 +223,71 @@ import { AuthService } from '../../../core/services/auth.service';
       border-color:#1a237e
     }
 
-    .preview-container{
-      margin-top:1rem;
-      display:flex;
-      justify-content:center
+    .upload-zone{
+      border: 2px dashed #c5cae9;
+      border-radius: 12px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: #fafbff;
+      position: relative;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .3rem;
     }
 
-    .preview-img{
-      width:220px;
-      max-height:220px;
-      object-fit:cover;
-      border-radius:12px;
-      border:2px solid #ddd;
-      box-shadow:0 2px 8px rgba(0,0,0,.15)
+    .upload-zone:hover{
+      border-color: #1a237e;
+      background: #f0f4ff;
     }
+
+    .upload-zone.has-image{
+      border-style: solid;
+      border-color: #1a237e;
+      padding: .5rem;
+    }
+
+    .upload-icon{ font-size: 2.2rem; line-height: 1; }
+
+    .upload-text{
+      margin: 0;
+      font-size: .9rem;
+      font-weight: 600;
+      color: #1a237e;
+    }
+
+    .upload-hint{
+      margin: 0;
+      font-size: .78rem;
+      color: #999;
+    }
+
+    .preview-img-zone{
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .btn-remove-photo{
+      margin-top: .5rem;
+      background: #ffebee;
+      color: #c62828;
+      border: none;
+      border-radius: 6px;
+      padding: .35rem .85rem;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-remove-photo:hover{ background: #ffcdd2; }
 
     .alert-success{
       background:#e8f5e9;
@@ -339,21 +403,27 @@ export class PetFormComponent implements OnInit {
   }
 
   onFileSelected(event: any): void {
-
     const file = event.target.files[0];
+    if (file) this.loadFile(file);
+  }
 
-    if (file) {
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    const file = event.dataTransfer?.files[0];
+    if (file) this.loadFile(file);
+  }
 
-      this.selectedFile = file;
+  removePhoto(event: MouseEvent): void {
+    event.stopPropagation();
+    this.previewUrl = null;
+    this.selectedFile = null;
+  }
 
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.previewUrl = reader.result;
-      };
-
-      reader.readAsDataURL(file);
-    }
+  private loadFile(file: File): void {
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = () => { this.previewUrl = reader.result; };
+    reader.readAsDataURL(file);
   }
 
 onSubmit() {

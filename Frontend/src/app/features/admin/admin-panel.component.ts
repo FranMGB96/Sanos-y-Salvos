@@ -72,8 +72,6 @@ import { Router } from '@angular/router';
           </thead>
           <tbody>
             <ng-container *ngFor="let u of usuarios">
-
-              <!-- Fila normal -->
               <tr *ngIf="editandoUsuarioId !== u.id">
                 <td>{{ u.id }}</td>
                 <td>{{ u.nombre }}</td>
@@ -87,36 +85,26 @@ import { Router } from '@angular/router';
                 </td>
                 <td>{{ u.createdAt | date:'dd/MM/yyyy' }}</td>
                 <td class="actions-cell">
-                  <button class="btn-edit" (click)="iniciarEdicion(u)">✏️ Editar</button>
+                  <button class="btn-edit" (click)="iniciarEdicionUsuario(u)">✏️ Editar</button>
                   <button
                     class="btn-toggle"
                     [class.btn-deactivate]="u.active"
                     [class.btn-activate]="!u.active"
                     (click)="toggleActivo(u)"
                     [disabled]="u.id === currentUser?.userId"
-                    [title]="u.id === currentUser?.userId ? 'No puedes modificar tu propio estado' : ''"
                   >
                     {{ u.active ? '🔒 Desactivar' : '🔓 Activar' }}
                   </button>
                 </td>
               </tr>
 
-              <!-- Fila en modo edición -->
               <tr *ngIf="editandoUsuarioId === u.id" class="fila-editando">
                 <td>{{ u.id }}</td>
+                <td><input class="input-edit" [(ngModel)]="edicionNombre" placeholder="Nombre" /></td>
+                <td><input class="input-edit" [(ngModel)]="edicionEmail" placeholder="Email" type="email" /></td>
+                <td><input class="input-edit" [(ngModel)]="edicionTelefono" placeholder="Teléfono" type="tel" /></td>
                 <td>
-                  <input class="input-edit" [(ngModel)]="edicionNombre" placeholder="Nombre" />
-                </td>
-                <td>
-                  <input class="input-edit" [(ngModel)]="edicionEmail" placeholder="Email" type="email" />
-                </td>
-                <!-- ✅ TELÉFONO EDITABLE -->
-                <td>
-                  <input class="input-edit" [(ngModel)]="edicionTelefono" placeholder="Teléfono" type="tel" />
-                </td>
-                <td>
-                  <select class="select-edit" [(ngModel)]="edicionRol"
-                    [disabled]="u.id === currentUser?.userId">
+                  <select class="select-edit" [(ngModel)]="edicionRol" [disabled]="u.id === currentUser?.userId">
                     <option value="OWNER">OWNER</option>
                     <option value="CITIZEN">CITIZEN</option>
                     <option value="ORG">ORG</option>
@@ -130,13 +118,12 @@ import { Router } from '@angular/router';
                 </td>
                 <td>{{ u.createdAt | date:'dd/MM/yyyy' }}</td>
                 <td class="actions-cell">
-                  <button class="btn-save" (click)="guardarEdicion(u)" [disabled]="guardando">
+                  <button class="btn-save" (click)="guardarEdicionUsuario(u)" [disabled]="guardando">
                     {{ guardando ? '...' : '💾 Guardar' }}
                   </button>
-                  <button class="btn-cancel" (click)="cancelarEdicion()">✖ Cancelar</button>
+                  <button class="btn-cancel-edit" (click)="cancelarEdicion()">✖ Cancelar</button>
                 </td>
               </tr>
-
             </ng-container>
           </tbody>
         </table>
@@ -152,23 +139,81 @@ import { Router } from '@angular/router';
               <th>Nombre</th>
               <th>Especie</th>
               <th>Raza</th>
+              <th>Color</th>
+              <th>Tamaño</th>
               <th>Dueño ID</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of mascotas">
-              <td>{{ p.id }}</td>
-              <td>{{ p.nombre }}</td>
-              <td>{{ p.especie }}</td>
-              <td>{{ p.raza || '—' }}</td>
-              <td>{{ p.ownerId }}</td>
-              <td><span class="badge" [class.badge-active]="p.active">{{ p.active ? 'Activo' : 'Inactivo' }}</span></td>
-              <td>
-                <button class="btn-danger" (click)="eliminarMascota(p)">🗑 Eliminar</button>
-              </td>
-            </tr>
+            <ng-container *ngFor="let p of mascotas">
+
+              <!-- Fila normal -->
+              <tr *ngIf="editandoMascotaId !== p.id">
+                <td>{{ p.id }}</td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.especie }}</td>
+                <td>{{ p.raza || '—' }}</td>
+                <td>{{ p.color || '—' }}</td>
+                <td>{{ p.tamanio || '—' }}</td>
+                <td>{{ p.ownerId }}</td>
+                <td>
+                  <span class="badge" [class.badge-active]="p.active" [class.badge-inactive]="!p.active">
+                    {{ p.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  <button class="btn-edit" (click)="iniciarEdicionMascota(p)">✏️ Editar</button>
+                  <button class="btn-danger" (click)="eliminarMascota(p)">🗑 Eliminar</button>
+                </td>
+              </tr>
+
+              <!-- Fila en modo edición -->
+              <tr *ngIf="editandoMascotaId === p.id" class="fila-editando">
+                <td>{{ p.id }}</td>
+                <td>
+                  <input class="input-edit" [(ngModel)]="petEdNombre" placeholder="Nombre" />
+                </td>
+                <td>
+                  <select class="select-edit" [(ngModel)]="petEdEspecie">
+                    <option value="perro">perro</option>
+                    <option value="gato">gato</option>
+                    <option value="ave">ave</option>
+                    <option value="conejo">conejo</option>
+                    <option value="pez">pez</option>
+                    <option value="otro">otro</option>
+                  </select>
+                </td>
+                <td>
+                  <input class="input-edit" [(ngModel)]="petEdRaza" placeholder="Raza" />
+                </td>
+                <td>
+                  <input class="input-edit" [(ngModel)]="petEdColor" placeholder="Color" />
+                </td>
+                <td>
+                  <select class="select-edit" [(ngModel)]="petEdTamanio">
+                    <option value="">—</option>
+                    <option value="PEQUENIO">Pequeño</option>
+                    <option value="MEDIANO">Mediano</option>
+                    <option value="GRANDE">Grande</option>
+                  </select>
+                </td>
+                <td>{{ p.ownerId }}</td>
+                <td>
+                  <span class="badge" [class.badge-active]="p.active" [class.badge-inactive]="!p.active">
+                    {{ p.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td class="actions-cell">
+                  <button class="btn-save" (click)="guardarEdicionMascota(p)" [disabled]="guardandoMascota">
+                    {{ guardandoMascota ? '...' : '💾 Guardar' }}
+                  </button>
+                  <button class="btn-cancel-edit" (click)="cancelarEdicionMascota()">✖ Cancelar</button>
+                </td>
+              </tr>
+
+            </ng-container>
           </tbody>
         </table>
       </div>
@@ -214,7 +259,7 @@ import { Router } from '@angular/router';
         </table>
       </div>
 
-      <!-- Toast notificación -->
+      <!-- Toast -->
       <div class="toast" [class.toast-visible]="toastVisible" [class.toast-error]="toastError">
         {{ toastMsg }}
       </div>
@@ -222,7 +267,7 @@ import { Router } from '@angular/router';
     </div>
   `,
   styles: [`
-    .page{ padding:5rem 2rem 2rem; max-width:1200px; margin:0 auto }
+    .page{ padding:5rem 2rem 2rem; max-width:1300px; margin:0 auto }
     .admin-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem }
     .admin-header h1{ font-size:1.8rem; color:#1a237e; margin:0 0 .25rem }
     .admin-header p{ color:#666; margin:0 }
@@ -254,8 +299,8 @@ import { Router } from '@angular/router';
 
     .actions-cell{ display:flex; gap:.4rem; flex-wrap:wrap }
 
-    .input-edit{ width:100%; padding:.35rem .6rem; border:1.5px solid #1a237e; border-radius:6px; font-size:.85rem; outline:none; box-sizing:border-box }
-    .select-edit{ padding:.35rem .6rem; border:1.5px solid #1a237e; border-radius:6px; font-size:.85rem; width:100% }
+    .input-edit{ width:100%; padding:.35rem .6rem; border:1.5px solid #1a237e; border-radius:6px; font-size:.85rem; outline:none; box-sizing:border-box; min-width:80px }
+    .select-edit{ padding:.35rem .6rem; border:1.5px solid #1a237e; border-radius:6px; font-size:.85rem; width:100%; min-width:90px }
 
     select{ padding:.3rem .6rem; border-radius:6px; border:1px solid #ddd; font-size:.85rem }
 
@@ -273,8 +318,8 @@ import { Router } from '@angular/router';
     .btn-save:hover:not(:disabled){ background:#283593 }
     .btn-save:disabled{ opacity:.5; cursor:not-allowed }
 
-    .btn-cancel{ padding:.3rem .7rem; background:#f5f5f5; color:#555; border:none; border-radius:6px; cursor:pointer; font-size:.82rem; font-weight:600; white-space:nowrap }
-    .btn-cancel:hover{ background:#e0e0e0 }
+    .btn-cancel-edit{ padding:.3rem .7rem; background:#f5f5f5; color:#555; border:none; border-radius:6px; cursor:pointer; font-size:.82rem; font-weight:600; white-space:nowrap }
+    .btn-cancel-edit:hover{ background:#e0e0e0 }
 
     .btn-danger{ padding:.3rem .8rem; background:#ffebee; color:#c62828; border:none; border-radius:6px; cursor:pointer; font-size:.85rem; font-weight:600 }
     .btn-danger:hover{ background:#c62828; color:white }
@@ -307,9 +352,18 @@ export class AdminPanelComponent implements OnInit {
   editandoUsuarioId: number | null = null;
   edicionNombre   = '';
   edicionEmail    = '';
-  edicionTelefono = ''; // ✅ NUEVO
+  edicionTelefono = '';
   edicionRol      = '';
   guardando       = false;
+
+  // ── Edición de mascota ──────────────────────────────────────
+  editandoMascotaId: number | null = null;
+  petEdNombre  = '';
+  petEdEspecie = '';
+  petEdRaza    = '';
+  petEdColor   = '';
+  petEdTamanio = '';
+  guardandoMascota = false;
 
   // ── Toast ───────────────────────────────────────────────────
   toastMsg     = '';
@@ -368,11 +422,12 @@ export class AdminPanelComponent implements OnInit {
 
   // ── Edición de usuario ──────────────────────────────────────
 
-  iniciarEdicion(u: any) {
+  iniciarEdicionUsuario(u: any) {
+    this.cancelarEdicionMascota();
     this.editandoUsuarioId = u.id;
     this.edicionNombre   = u.nombre;
     this.edicionEmail    = u.email;
-    this.edicionTelefono = u.telefono || ''; // ✅ NUEVO
+    this.edicionTelefono = u.telefono || '';
     this.edicionRol      = u.rol;
   }
 
@@ -380,12 +435,12 @@ export class AdminPanelComponent implements OnInit {
     this.editandoUsuarioId = null;
   }
 
-  guardarEdicion(u: any) {
+  guardarEdicionUsuario(u: any) {
     this.guardando = true;
     const payload = {
       nombre:   this.edicionNombre,
       email:    this.edicionEmail,
-      telefono: this.edicionTelefono, // ✅ NUEVO
+      telefono: this.edicionTelefono,
       rol:      this.edicionRol,
       active:   u.active
     };
@@ -421,7 +476,51 @@ export class AdminPanelComponent implements OnInit {
     });
   }
 
-  // ── Mascotas ────────────────────────────────────────────────
+  // ── Edición de mascota ──────────────────────────────────────
+
+  iniciarEdicionMascota(p: any) {
+    this.cancelarEdicion();
+    this.editandoMascotaId = p.id;
+    this.petEdNombre  = p.nombre;
+    this.petEdEspecie = p.especie;
+    this.petEdRaza    = p.raza    || '';
+    this.petEdColor   = p.color   || '';
+    this.petEdTamanio = p.tamanio || '';
+  }
+
+  cancelarEdicionMascota() {
+    this.editandoMascotaId = null;
+  }
+
+  guardarEdicionMascota(p: any) {
+    this.guardandoMascota = true;
+
+    // El pet-service exige multipart/form-data
+    const fd = new FormData();
+    fd.append('nombre',   this.petEdNombre);
+    fd.append('especie',  this.petEdEspecie);
+    fd.append('raza',     this.petEdRaza);
+    fd.append('color',    this.petEdColor);
+    fd.append('tamanio',  this.petEdTamanio);
+    fd.append('descripcion', p.descripcion || '');
+
+    this.petService.update(p.id, fd).subscribe({
+      next: (actualizado) => {
+        const idx = this.mascotas.findIndex(m => m.id === p.id);
+        if (idx !== -1) this.mascotas[idx] = { ...this.mascotas[idx], ...actualizado };
+        this.editandoMascotaId = null;
+        this.guardandoMascota  = false;
+        this.showToast('✅ Mascota actualizada correctamente');
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'Error al actualizar la mascota';
+        this.showToast(msg, true);
+        this.guardandoMascota = false;
+      }
+    });
+  }
+
+  // ── Mascotas — eliminar ─────────────────────────────────────
 
   eliminarMascota(pet: any) {
     if (!confirm(`¿Eliminar a ${pet.nombre}?`)) return;
@@ -455,9 +554,10 @@ export class AdminPanelComponent implements OnInit {
         reporte.estado = r.estado;
         this.showToast(`✅ Estado cambiado a ${r.estado}`);
       },
-      error: () => {
+      error: (e) => {
+        console.error('Error cambiar estado:', e.status, e.error);
         event.target.value = estadoAnterior;
-        this.showToast('Error al cambiar el estado', true);
+        this.showToast(`Error ${e.status}: ${e.error?.message || e.message || 'desconocido'}`, true);
       }
     });
   }

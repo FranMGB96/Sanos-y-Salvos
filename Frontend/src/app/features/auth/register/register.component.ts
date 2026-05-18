@@ -12,83 +12,96 @@ import { AuthService } from '../../../core/services/auth.service';
     <div class="auth-page">
       <div class="auth-card">
 
-        <div class="auth-header">
-          <span class="logo">🐾</span>
-          <h1>Crear Cuenta</h1>
-          <p>Únete a Sanos y Salvos</p>
+        <!-- ══ PANTALLA DE ÉXITO ══ -->
+        <div *ngIf="registrado" class="success-screen">
+          <div class="success-icon">🎉</div>
+          <h1>¡Gracias, {{ nombreRegistrado }}!</h1>
+          <p class="success-msg">Tu cuenta fue creada exitosamente.<br>Ya puedes iniciar sesión.</p>
+          <a routerLink="/login" class="btn-login">Iniciar sesión →</a>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <!-- ══ FORMULARIO ══ -->
+        <ng-container *ngIf="!registrado">
 
-          <div class="field">
-            <label>Nombre completo *</label>
-            <input
-              type="text"
-              formControlName="nombre"
-              placeholder="Tu nombre"
-              [class.error]="f('nombre').invalid && f('nombre').touched"
-            >
-            <span class="err" *ngIf="f('nombre').invalid && f('nombre').touched">
-              Obligatorio
-            </span>
+          <div class="auth-header">
+            <span class="logo">🐾</span>
+            <h1>Crear Cuenta</h1>
+            <p>Únete a Sanos y Salvos</p>
           </div>
 
-          <div class="field">
-            <label>Email *</label>
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="tu@email.com"
-              [class.error]="f('email').invalid && f('email').touched"
-            >
-            <span class="err" *ngIf="f('email').invalid && f('email').touched">
-              Email válido requerido
-            </span>
-          </div>
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-          <div class="field">
-            <label>Teléfono de contacto *</label>
-            <div class="phone-wrapper">
-              <span class="phone-prefix">📞 +56</span>
+            <div class="field">
+              <label>Nombre completo *</label>
               <input
-                type="tel"
-                formControlName="telefono"
-                placeholder="9 1234 5678"
-                [class.error]="f('telefono').invalid && f('telefono').touched"
+                type="text"
+                formControlName="nombre"
+                placeholder="Tu nombre"
+                [class.error]="f('nombre').invalid && f('nombre').touched"
               >
+              <span class="err" *ngIf="f('nombre').invalid && f('nombre').touched">
+                Obligatorio
+              </span>
             </div>
-            <span class="err" *ngIf="f('telefono').invalid && f('telefono').touched">
-              Teléfono válido requerido (mínimo 8 dígitos)
-            </span>
-            <span class="field-hint">
-              Este número se mostrará en tus reportes para que puedan contactarte
-            </span>
-          </div>
 
-          <div class="field">
-            <label>Contraseña *</label>
-            <input
-              type="password"
-              formControlName="password"
-              placeholder="Mínimo 6 caracteres"
-              [class.error]="f('password').invalid && f('password').touched"
-            >
-            <span class="err" *ngIf="f('password').invalid && f('password').touched">
-              Mínimo 6 caracteres
-            </span>
-          </div>
+            <div class="field">
+              <label>Email *</label>
+              <input
+                type="email"
+                formControlName="email"
+                placeholder="tu@email.com"
+                [class.error]="f('email').invalid && f('email').touched"
+              >
+              <span class="err" *ngIf="f('email').invalid && f('email').touched">
+                Email válido requerido
+              </span>
+            </div>
 
-          <div class="alert" *ngIf="errorMsg">{{ errorMsg }}</div>
+            <div class="field">
+              <label>Teléfono de contacto *</label>
+              <div class="phone-wrapper">
+                <span class="phone-prefix">📞 +56</span>
+                <input
+                  type="tel"
+                  formControlName="telefono"
+                  placeholder="9 1234 5678"
+                  [class.error]="f('telefono').invalid && f('telefono').touched"
+                >
+              </div>
+              <span class="err" *ngIf="f('telefono').invalid && f('telefono').touched">
+                Teléfono válido requerido (mínimo 8 dígitos)
+              </span>
+              <span class="field-hint">
+                Este número se mostrará en tus reportes para que puedan contactarte
+              </span>
+            </div>
 
-          <button type="submit" [disabled]="loading">
-            {{ loading ? 'Registrando...' : 'Registrarse' }}
-          </button>
+            <div class="field">
+              <label>Contraseña *</label>
+              <input
+                type="password"
+                formControlName="password"
+                placeholder="Mínimo 6 caracteres"
+                [class.error]="f('password').invalid && f('password').touched"
+              >
+              <span class="err" *ngIf="f('password').invalid && f('password').touched">
+                Mínimo 6 caracteres
+              </span>
+            </div>
 
-        </form>
+            <div class="alert" *ngIf="errorMsg">{{ errorMsg }}</div>
 
-        <p class="footer-link">
-          ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
-        </p>
+            <button type="submit" [disabled]="loading">
+              {{ loading ? 'Registrando...' : 'Registrarse' }}
+            </button>
+
+          </form>
+
+          <p class="footer-link">
+            ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a>
+          </p>
+
+        </ng-container>
 
       </div>
     </div>
@@ -236,12 +249,66 @@ import { AuthService } from '../../../core/services/auth.service';
       color:#1a237e;
       font-weight:600;
     }
+
+    /* ── Pantalla de éxito ── */
+    .success-screen{
+      text-align:center;
+      padding: 1rem 0 .5rem;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:1rem;
+    }
+
+    .success-icon{
+      font-size:4rem;
+      animation: pop .4s ease-out;
+    }
+
+    @keyframes pop{
+      0%  { transform:scale(0); opacity:0; }
+      80% { transform:scale(1.15); }
+      100%{ transform:scale(1);  opacity:1; }
+    }
+
+    .success-screen h1{
+      font-size:1.6rem;
+      color:#1a237e;
+      margin:0;
+    }
+
+    .success-msg{
+      color:#555;
+      font-size:.95rem;
+      line-height:1.6;
+      margin:0;
+    }
+
+    .btn-login{
+      margin-top:.5rem;
+      display:inline-block;
+      background:#1a237e;
+      color:white;
+      padding:.85rem 2.5rem;
+      border-radius:8px;
+      font-size:1rem;
+      font-weight:700;
+      text-decoration:none;
+      transition:background .2s, transform .15s;
+    }
+
+    .btn-login:hover{
+      background:#283593;
+      transform:translateY(-2px);
+    }
   `]
 })
 export class RegisterComponent {
   form: FormGroup;
   loading = false;
   errorMsg = '';
+  registrado = false;
+  nombreRegistrado = '';
 
   constructor(
     private fb: FormBuilder,
@@ -263,7 +330,6 @@ export class RegisterComponent {
     this.loading = true;
     this.errorMsg = '';
 
-    // Limpiar el teléfono antes de enviar (solo dígitos)
     const raw = this.form.value;
     const payload = {
       ...raw,
@@ -271,7 +337,14 @@ export class RegisterComponent {
     };
 
     this.auth.register(payload).subscribe({
-      next: () => this.router.navigate(['/inicio']),
+      next: () => {
+        // Limpiar sesión sin redirigir (logout() redirige a /login automáticamente)
+        localStorage.removeItem('sns_token');
+        localStorage.removeItem('sns_user');
+        this.nombreRegistrado = raw.nombre.split(' ')[0];
+        this.registrado = true;
+        this.loading = false;
+      },
       error: (e: any) => {
         this.errorMsg = e.error?.message || 'Error al registrar.';
         this.loading = false;

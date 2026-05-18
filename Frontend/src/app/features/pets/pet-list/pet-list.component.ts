@@ -1,9 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { PetService } from '../../../core/services/pet.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Pet } from '../../../core/models/pet.model';
+import { environment } from '../../../../environments/environment';
+
+interface PetConDueno extends Pet {
+  nombreDueno?: string;
+}
 
 @Component({
   selector: 'app-pet-list',
@@ -35,7 +43,7 @@ import { Pet } from '../../../core/models/pet.model';
               (error)="pet.fotoUrl='https://placehold.co/400x300?text=Mascota'"
             >
             <span *ngIf="!pet.fotoUrl" class="pet-emoji">
-              {{ pet.especie === 'gato' ? '🐱' : '🐶' }}
+              {{ getEmoji(pet.especie) }}
             </span>
           </div>
 
@@ -49,15 +57,17 @@ import { Pet } from '../../../core/models/pet.model';
             </div>
           </div>
 
-          <!-- ✅ Botones solo visibles para el dueño -->
+          <!-- Botones para el dueño -->
           <div class="pet-actions" *ngIf="isOwner(pet)">
             <a [routerLink]="['/pets/edit', pet.id]" class="btn-edit">Editar</a>
             <button class="btn-delete" (click)="delete(pet)">Eliminar</button>
           </div>
 
-          <!-- Indicador para mascotas de otros usuarios -->
+          <!-- Nombre del dueño para mascotas de otros -->
           <div class="pet-actions pet-other" *ngIf="!isOwner(pet)">
-            <span class="owner-badge">👤 Mascota de otro usuario</span>
+            <span class="owner-badge">
+              👤 {{ pet.nombreDueno || 'Cargando...' }}
+            </span>
           </div>
 
         </div>
@@ -129,7 +139,7 @@ import { Pet } from '../../../core/models/pet.model';
     }
 
     .owner-badge{
-      font-size:.78rem; color:#999; font-style:italic
+      font-size:.85rem; color:#555; font-weight:600;
     }
 
     .btn-edit{
@@ -149,36 +159,75 @@ import { Pet } from '../../../core/models/pet.model';
     .empty-state p{ color:#666; margin-bottom:1.5rem }
   `]
 })
-
 export class PetListComponent implements OnInit {
 
-  pets: Pet[] = [];
+  pets: PetConDueno[] = [];
   loading = true;
   currentUserId: number | null = null;
 
   constructor(
     private petService: PetService,
-    private auth: AuthService   // ✅ inyectado
+    private auth: AuthService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
-    // ✅ Obtener el id del usuario logueado
     this.currentUserId = this.auth.getCurrentUser()?.userId ?? null;
 
     this.petService.getAll().subscribe({
-      next: (p) => { this.pets = p; this.loading = false; },
+      next: (mascotas) => {
+        // ownerIds únicos que NO son el usuario actual
+        const ownerIdsAjenos = [...new Set(
+          mascotas
+            .filter(p => p.ownerId !== this.currentUserId)
+            .map(p => p.ownerId)
+        )];
+
+        if (ownerIdsAjenos.length === 0) {
+          this.pets = mascotas;
+          this.loading = false;
+          return;
+        }
+
+        // Consultar nombre de cada dueño en paralelo
+        const peticiones = ownerIdsAjenos.map(id =>
+          this.http.get<any>(`${environment.apiUrl}/users/${id}`).pipe(
+            map(u => ({ id, nombre: u.nombre as string })),
+            catchError(() => of({ id, nombre: 'Usuario desconocido' }))
+          )
+        );
+
+        forkJoin(peticiones).subscribe(duenos => {
+          const mapaDuenos = new Map(duenos.map(d => [d.id, d.nombre]));
+          this.pets = mascotas.map(p => ({
+            ...p,
+            nombreDueno: p.ownerId !== this.currentUserId
+              ? mapaDuenos.get(p.ownerId) ?? 'Usuario desconocido'
+              : undefined
+          }));
+          this.loading = false;
+        });
+      },
       error: () => { this.loading = false; }
     });
   }
 
-  // ✅ Verifica si la mascota pertenece al usuario actual
+  getEmoji(especie: string): string {
+    const e = especie?.toLowerCase();
+    if (e === 'perro')  return '🐶';
+    if (e === 'gato')   return '🐱';
+    if (e === 'ave')    return '🐦';
+    if (e === 'conejo') return '🐰';
+    if (e === 'pez')    return '🐟';
+    return '🐾';
+  }
+
   isOwner(pet: Pet): boolean {
     return pet.ownerId === this.currentUserId;
   }
 
   delete(pet: Pet) {
     if (!confirm(`¿Eliminar a ${pet.nombre}?`)) return;
-
     this.petService.delete(pet.id!).subscribe(() => {
       this.pets = this.pets.filter(p => p.id !== pet.id);
     });
