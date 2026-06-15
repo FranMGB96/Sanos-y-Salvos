@@ -165,3 +165,30 @@ mvn spring-boot:run
 ```
 
 Requiere que `config-server` y `eureka-server` estén corriendo primero.
+
+---
+
+## 🧪 Pruebas
+
+### Pruebas de integración — `AuthControllerIntegrationTest`
+
+Ubicación: `src/test/java/com/sanosysalvos/userservice/AuthControllerIntegrationTest.java`
+
+Usa `@SpringBootTest` + **H2 en memoria** + `MockMvc`. No requiere MySQL ni ningún servicio externo.
+
+| Test | Descripción |
+|---|---|
+| `registro_datosValidos_retornaTokenYDatos` | Registro exitoso retorna 201 con token JWT |
+| `registro_emailDuplicado_retornaError400` | Email ya registrado retorna 400 |
+| `registro_sinNombre_retornaError400` | Validación de campo nombre vacío |
+| `login_credencialesCorrectas_retornaToken` | Login exitoso retorna token JWT válido |
+| `login_passwordIncorrecta_retornaError401` | Contraseña incorrecta retorna 401 |
+| `login_usuarioNoExiste_retornaError` | Usuario inexistente retorna 401 |
+
+**Correr desde IntelliJ:** clic derecho en `AuthControllerIntegrationTest` → **Run**
+
+**Correr desde terminal:**
+```bash
+cd businessdomain/user-service
+mvn test
+```

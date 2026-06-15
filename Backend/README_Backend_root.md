@@ -170,3 +170,41 @@ Cada microservicio tiene su propio README con detalles específicos:
 - [`infrastructure/api-gateway/README.md`](infrastructure/api-gateway/README.md)
 - [`infrastructure/bff-service/README.md`](infrastructure/bff-service/README.md)
 - [`infrastructure/springboot-admin/README.md`](infrastructure/springboot-admin/README.md)
+
+---
+
+## 🧪 Pruebas del backend
+
+### Pruebas unitarias
+
+No requieren nada levantado. Correr desde IntelliJ con clic derecho → **Run** sobre cada clase:
+
+| Clase | Servicio | Tests | Qué prueba |
+|---|---|---|---|
+| `PetServiceTest` | pet-service | 4 | Crear mascota, obtener por ID, listar activas, eliminar |
+| `ReportServiceTest` | report-service | 4 | Crear reporte, cambiar estado, filtrar por tipo, obtener por ID |
+
+### Pruebas de integración
+
+Usan **H2 en memoria** — no requieren MySQL ni Config Server. Correr desde IntelliJ con clic derecho → **Run**:
+
+| Clase | Servicio | Tests | Qué prueba |
+|---|---|---|---|
+| `AuthControllerIntegrationTest` | user-service | 6 | Registro exitoso, email duplicado, validaciones, login correcto, contraseña incorrecta, usuario inexistente |
+| `ReportControllerIntegrationTest` | report-service | 8 | Crear PERDIDO/ENCONTRADO, validaciones, listar, filtrar, cambiar estado, ID inexistente |
+
+### Correr todos los tests desde terminal
+
+```bash
+# user-service
+cd businessdomain/user-service
+mvn test
+
+# pet-service
+cd businessdomain/pet-service
+mvn test
+
+# report-service
+cd businessdomain/report-service
+mvn test
+```

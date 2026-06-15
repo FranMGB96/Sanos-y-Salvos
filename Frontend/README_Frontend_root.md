@@ -165,3 +165,53 @@ npm test
 ```
 
 Ejecuta los tests con Karma en modo headless (ChromeHeadless).
+
+---
+
+## 🧪 Pruebas E2E con Cypress
+
+### Instalación
+
+```bash
+npm install cypress --save-dev
+```
+
+### Correr tests
+
+```bash
+# Abrir interfaz gráfica de Cypress
+npx cypress open
+```
+
+Seleccionar **E2E Testing** → **Chrome** → elegir el archivo de test.
+
+> Requiere que el frontend esté corriendo en `localhost:4200` y el backend en `localhost:8080`.
+
+### Archivos de test
+
+Ubicación: `cypress/e2e/`
+
+#### `login.cy.js` — 7 tests
+
+| Test | Descripción |
+|---|---|
+| Login exitoso con credenciales válidas | Redirige al dashboard |
+| Login admin | Muestra el link al panel de administración |
+| Login con contraseña incorrecta | Permanece en /login |
+| Login con campos vacíos | No permite enviar |
+| Logout | Redirige al login |
+| Acceder a /inicio sin login | Redirige al login |
+| Acceder a /admin sin login | Redirige al login |
+
+#### `reporte.cy.js` — 8 tests
+
+| Test | Descripción |
+|---|---|
+| Dashboard | Muestra estadísticas del sistema |
+| Navegar a /reports | Muestra el listado de reportes |
+| Formulario de nuevo reporte | Carga correctamente |
+| Seleccionar tipo mascota perdida | Activa el botón |
+| Panel admin — usuarios | Carga la lista de usuarios |
+| Panel admin — mascotas | Tab de mascotas muestra contenido |
+| Panel admin — reportes | Tab de reportes muestra contenido |
+| Logout desde el dashboard | Redirige al login |

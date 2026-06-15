@@ -228,3 +228,33 @@ Proyecto desarrollado como parte del ramo de **Fullstack III** en DuocUC.
 |---|---|
 | Lucas Ribeiro | [@LucasVeloster](https://github.com/LucasVeloster) |
 | Francisco García | [@FranMGB96](https://github.com/FranMGB96) |
+
+---
+
+## 🧪 Pruebas
+
+El proyecto implementa tres niveles de pruebas cubriendo los procesos de negocio más críticos.
+
+### Resumen
+
+| Nivel | Herramienta | Tests | Archivos |
+|---|---|---|---|
+| Unitarias | JUnit 5 + Mockito | 8 | `PetServiceTest`, `ReportServiceTest` |
+| Integración | JUnit 5 + Spring Boot Test + H2 | 14 | `AuthControllerIntegrationTest`, `ReportControllerIntegrationTest` |
+| E2E | Cypress 15 + Chrome | 15 | `login.cy.js`, `reporte.cy.js` |
+| **Total** | | **37** | |
+
+### Pruebas unitarias
+Prueban clases individuales de forma aislada usando **Mockito**. No requieren base de datos ni servidor.
+
+### Pruebas de integración
+Levantan el contexto completo de Spring Boot con **H2 en memoria**. Prueban el flujo Controller → Service → Base de datos sin necesitar MySQL ni ningún servicio externo.
+
+### Pruebas E2E
+Simulan un usuario real navegando en el navegador con **Cypress**. Requieren frontend en `localhost:4200` y backend en `localhost:8080`.
+
+```bash
+# Correr tests E2E
+cd Frontend
+npx cypress open
+```

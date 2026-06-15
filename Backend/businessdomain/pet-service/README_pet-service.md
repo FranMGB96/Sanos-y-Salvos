@@ -145,3 +145,28 @@ mvn spring-boot:run
 ```
 
 Requiere que `config-server` y `eureka-server` estén corriendo primero.
+
+---
+
+## 🧪 Pruebas
+
+### Pruebas unitarias — `PetServiceTest`
+
+Ubicación: `src/test/java/com/sanosysalvos/petservice/PetServiceTest.java`
+
+Usa **JUnit 5 + Mockito**. No requiere base de datos ni servidor.
+
+| Test | Descripción |
+|---|---|
+| `createPet_datosValidos_retornaPet` | Crear mascota con datos válidos |
+| `getPetById_noExiste_lanzaExcepcion` | Lanza `ResourceNotFoundException` si no existe |
+| `getAllPets_retornaActivos` | Solo retorna mascotas con `active = true` |
+| `deletePet_desactiva` | Soft-delete marca la mascota como inactiva |
+
+**Correr desde IntelliJ:** clic derecho en `PetServiceTest` → **Run**
+
+**Correr desde terminal:**
+```bash
+cd businessdomain/pet-service
+mvn test
+```

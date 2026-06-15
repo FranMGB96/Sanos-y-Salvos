@@ -143,3 +143,45 @@ mvn spring-boot:run
 ```
 
 Requiere que `config-server` y `eureka-server` estén corriendo primero.
+
+---
+
+## 🧪 Pruebas
+
+### Pruebas unitarias — `ReportServiceTest`
+
+Ubicación: `src/test/java/com/sanosysalvos/reportservice/ReportServiceTest.java`
+
+Usa **JUnit 5 + Mockito**. No requiere base de datos ni servidor.
+
+| Test | Descripción |
+|---|---|
+| `createReport_datosValidos_retornaReporte` | Crear reporte con datos válidos |
+| `updateEstado_cambiaCorrecto` | Cambiar estado de reporte correctamente |
+| `getByTipo_retornaFiltrados` | Filtrar reportes por tipo PERDIDO/ENCONTRADO |
+| `getReportById_noExiste_lanzaExcepcion` | Lanza `ResourceNotFoundException` si no existe |
+
+### Pruebas de integración — `ReportControllerIntegrationTest`
+
+Ubicación: `src/test/java/com/sanosysalvos/reportservice/ReportControllerIntegrationTest.java`
+
+Usa `@SpringBootTest` + **H2 en memoria** + `MockMvc`. No requiere MySQL ni ningún servicio externo.
+
+| Test | Descripción |
+|---|---|
+| `crearReporte_perdido_retorna201` | Crear reporte PERDIDO retorna 201 con estado ACTIVO |
+| `crearReporte_encontrado_retorna201` | Crear reporte ENCONTRADO retorna 201 |
+| `crearReporte_sinTipo_retornaError400` | Validación de campo tipo requerido |
+| `crearReporte_sinDescripcion_retornaError400` | Validación de campo descripción requerido |
+| `listarReportes_retornaLista` | Lista no vacía después de crear un reporte |
+| `filtrarPorTipo_perdido_soloRetornaPerdidos` | Filtro por tipo funciona correctamente |
+| `cambiarEstado_aResuelto_exitoso` | Cambio de estado a RESUELTO funciona |
+| `getReporteById_noExiste_retorna404` | ID inexistente retorna 404 |
+
+**Correr desde IntelliJ:** clic derecho en la clase → **Run**
+
+**Correr desde terminal:**
+```bash
+cd businessdomain/report-service
+mvn test
+```
