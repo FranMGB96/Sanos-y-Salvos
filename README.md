@@ -220,17 +220,6 @@ Con los servicios corriendo:
 
 ---
 
-## 👥 Equipo
-
-Proyecto desarrollado como parte del ramo de **Fullstack III** en DuocUC.
-
-| Integrante | GitHub |
-|---|---|
-| Lucas Ribeiro | [@LucasVeloster](https://github.com/LucasVeloster) |
-| Francisco García | [@FranMGB96](https://github.com/FranMGB96) |
-
----
-
 ## 🧪 Pruebas
 
 El proyecto implementa tres niveles de pruebas cubriendo los procesos de negocio más críticos.
@@ -252,6 +241,19 @@ Levantan el contexto completo de Spring Boot con **H2 en memoria**. Prueban el f
 
 ### Pruebas E2E
 Simulan un usuario real navegando en el navegador con **Cypress**. Requieren frontend en `localhost:4200` y backend en `localhost:8080`.
+
+---
+
+## 👥 Equipo
+
+Proyecto desarrollado como parte del ramo de **Fullstack III** en DuocUC.
+
+| Integrante | GitHub |
+|---|---|
+| Lucas Ribeiro | [@LucasVeloster](https://github.com/LucasVeloster) |
+| Francisco García | [@FranMGB96](https://github.com/FranMGB96) |
+
+---
 
 ```bash
 # Correr tests E2E
