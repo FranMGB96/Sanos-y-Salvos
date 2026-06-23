@@ -22,7 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Prueba los endpoints críticos del proceso de negocio de reportes:
  * crear reporte, listar, filtrar por tipo y cambiar estado.
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect",
+        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+        "spring.cloud.config.enabled=false"
+})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -57,8 +61,8 @@ class ReportControllerIntegrationTest {
                 .build();
 
         String response = mockMvc.perform(post("/reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("PERDIDO"))
                 .andExpect(jsonPath("$.estado").value("ACTIVO"))
@@ -84,8 +88,8 @@ class ReportControllerIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("ENCONTRADO"))
                 .andExpect(jsonPath("$.estado").value("ACTIVO"));
@@ -101,8 +105,8 @@ class ReportControllerIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -116,8 +120,8 @@ class ReportControllerIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -178,18 +182,18 @@ class ReportControllerIntegrationTest {
     void cambiarEstado_aResuelto_exitoso() throws Exception {
         // Crear reporte
         String response = mockMvc.perform(post("/reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(
-                        ReportDto.builder().tipo("PERDIDO").descripcion("Mascota para resolver").reporterUserId(1L).build())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                ReportDto.builder().tipo("PERDIDO").descripcion("Mascota para resolver").reporterUserId(1L).build())))
                 .andReturn().getResponse().getContentAsString();
 
         Long id = objectMapper.readTree(response).get("id").asLong();
 
         // Cambiar estado
         mockMvc.perform(patch("/reports/" + id + "/estado")
-                .param("estado", "RESUELTO")
-                .header("X-User-Id",   "1")
-                .header("X-User-Role", "OWNER"))
+                        .param("estado", "RESUELTO")
+                        .header("X-User-Id",   "1")
+                        .header("X-User-Role", "OWNER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("RESUELTO"));
     }
