@@ -250,7 +250,6 @@ Proyecto desarrollado como parte del ramo de **Fullstack III** en DuocUC.
 
 | Integrante | GitHub |
 |---|---|
-| Lucas Ribeiro | [@LucasVeloster](https://github.com/LucasVeloster) |
 | Francisco García | [@FranMGB96](https://github.com/FranMGB96) |
 
 ---
